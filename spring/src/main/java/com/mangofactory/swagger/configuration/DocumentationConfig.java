@@ -13,7 +13,6 @@ import com.mangofactory.swagger.models.Jackson2SchemaDescriptor;
 import com.mangofactory.swagger.models.SchemaDescriptor;
 import com.mangofactory.swagger.spring.controller.DocumentationController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,15 +21,6 @@ public class DocumentationConfig {
     @Bean
     public DocumentationController documentationController() {
         return new DocumentationController();
-    }
-
-    @Bean
-    @Autowired
-    public SwaggerConfiguration swaggerConfiguration(DefaultConfigurationModule defaultConfig,
-        ExtensibilityModule extensibility, @Value("${documentation.services.basePath}") String basePath,
-        @Value("${documentation.services.version}") String apiVersion) {
-        SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration(apiVersion, basePath);
-        return extensibility.apply(defaultConfig.apply(swaggerConfiguration));
     }
 
     @Bean

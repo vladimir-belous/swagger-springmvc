@@ -1,11 +1,11 @@
 package com.mangofactory.swagger;
 
 import com.mangofactory.swagger.filters.Filter;
-import com.wordnik.swagger.core.Documentation;
-import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.model.ApiListing;
+import com.wordnik.swagger.model.Operation;
+import com.wordnik.swagger.model.Parameter;
+import com.wordnik.swagger.model.ResourceListing;
+import com.wordnik.swagger.model.ResponseMessage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -13,53 +13,53 @@ import java.util.List;
 import static com.google.common.collect.Lists.*;
 
 public class SwaggerConfigurationExtension {
-    private List<Filter<Documentation>> documentationFilters = newArrayList();
-    private List<Filter<DocumentationEndPoint>> endpointFilters = newArrayList();
-    private List<Filter<DocumentationOperation>> operationFilters = newArrayList();
-    private List<Filter<DocumentationParameter>> parameterFilters = newArrayList();
-    private List<Filter<List<DocumentationError>>> errorFilters = newArrayList();
+    private List<Filter<ResourceListing>> documentationFilters = newArrayList();
+    private List<Filter<ApiListing>> endpointFilters = newArrayList();
+    private List<Filter<Operation>> operationFilters = newArrayList();
+    private List<Filter<Parameter>> parameterFilters = newArrayList();
+    private List<Filter<List<ResponseMessage>>> errorFilters = newArrayList();
     private List<Class<?>> ignorableParameterTypes = newArrayList();
     private DocumentationTransformer documentationTransformer;
-    private Comparator<DocumentationEndPoint> endPointComparator;
-    private Comparator<DocumentationOperation> operationComparator;
+    private Comparator<ApiListing> endPointComparator;
+    private Comparator<Operation> operationComparator;
 
-    public List<Filter<Documentation>> getDocumentationFilters() {
+    public List<Filter<ResourceListing>> getDocumentationFilters() {
         return documentationFilters;
     }
 
-    public void setDocumentationFilters(List<Filter<Documentation>> documentationFilters) {
+    public void setDocumentationFilters(List<Filter<ResourceListing>> documentationFilters) {
         this.documentationFilters = documentationFilters;
     }
 
-    public List<Filter<DocumentationEndPoint>> getEndpointFilters() {
+    public List<Filter<ApiListing>> getEndpointFilters() {
         return endpointFilters;
     }
 
-    public void setEndpointFilters(List<Filter<DocumentationEndPoint>> endpointFilters) {
+    public void setEndpointFilters(List<Filter<ApiListing>> endpointFilters) {
         this.endpointFilters = endpointFilters;
     }
 
-    public List<Filter<DocumentationOperation>> getOperationFilters() {
+    public List<Filter<Operation>> getOperationFilters() {
         return operationFilters;
     }
 
-    public void setOperationFilters(List<Filter<DocumentationOperation>> operationFilters) {
+    public void setOperationFilters(List<Filter<Operation>> operationFilters) {
         this.operationFilters = operationFilters;
     }
 
-    public List<Filter<DocumentationParameter>> getParameterFilters() {
+    public List<Filter<Parameter>> getParameterFilters() {
         return parameterFilters;
     }
 
-    public void setParameterFilters(List<Filter<DocumentationParameter>> parameterFilters) {
+    public void setParameterFilters(List<Filter<Parameter>> parameterFilters) {
         this.parameterFilters = parameterFilters;
     }
 
-    public List<Filter<List<DocumentationError>>> getErrorFilters() {
+    public List<Filter<List<ResponseMessage>>> getErrorFilters() {
         return errorFilters;
     }
 
-    public void setErrorFilters(List<Filter<List<DocumentationError>>> errorFilters) {
+    public void setErrorFilters(List<Filter<List<ResponseMessage>>> errorFilters) {
         this.errorFilters = errorFilters;
     }
 
@@ -79,19 +79,19 @@ public class SwaggerConfigurationExtension {
         this.documentationTransformer = documentationTransformer;
     }
 
-    public Comparator<DocumentationEndPoint> getEndPointComparator() {
+    public Comparator<ApiListing> getEndPointComparator() {
         return endPointComparator;
     }
 
-    public void setEndPointComparator(Comparator<DocumentationEndPoint> endPointComparator) {
+    public void setEndPointComparator(Comparator<ApiListing> endPointComparator) {
         this.endPointComparator = endPointComparator;
     }
 
-    public Comparator<DocumentationOperation> getOperationComparator() {
+    public Comparator<Operation> getOperationComparator() {
         return operationComparator;
     }
 
-    public void setOperationComparator(Comparator<DocumentationOperation> operationComparator) {
+    public void setOperationComparator(Comparator<Operation> operationComparator) {
         this.operationComparator = operationComparator;
     }
 }

@@ -10,8 +10,8 @@ import com.mangofactory.swagger.spring.sample.Pet;
 import com.mangofactory.swagger.spring.sample.configuration.ServicesTestConfiguration;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Operation;
+import com.wordnik.swagger.core.Parameter;
 import com.wordnik.swagger.sample.exception.BadRequestException;
 import com.wordnik.swagger.sample.exception.NotFoundException;
 import org.junit.Before;
@@ -72,25 +72,25 @@ public class OperationReaderTest {
     @Test
     public void paramDataTypeDetectedCorrectly() {
 
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
-        List<DocumentationParameter> parameters = operation.getParameters();
+        List<Parameter> parameters = operation.getParameters();
         assertThat(parameters.get(0).dataType(), equalToIgnoringCase("string"));
         assertThat(parameters.get(1).dataType(), equalToIgnoringCase("string"));
     }
 
     @Test
     public void setsNickanameCorrectly() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
         assertThat(operation.getNickname(), equalTo("sampleMethod"));
     }
 
     @Test
     public void apiParamNameTakesFirstPriority() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
-        List<DocumentationParameter> parameters = operation.getParameters();
+        List<Parameter> parameters = operation.getParameters();
         assertThat(parameters.size(), equalTo(5));
         assertThat(parameters.get(0).getName(), equalTo("documentationNameA"));
         assertThat(parameters.get(1).getName(), equalTo("mvcNameB"));
@@ -103,7 +103,7 @@ public class OperationReaderTest {
 
     @Test
     public void detectsErrorsUsingSwaggerDeclaration() throws NoSuchMethodException {
-        DocumentationOperation operation  = getExceptionMethod("exceptionMethodB");
+        Operation operation  = getExceptionMethod("exceptionMethodB");
         List<DocumentationError> errors = operation.getErrorResponses();
         assertThat(errors.size(), equalTo(2));
         DocumentationError error = errors.get(0);
@@ -113,7 +113,7 @@ public class OperationReaderTest {
 
     @Test
     public void detectsErrorsUsingSpringMVCDeclaration() throws NoSuchMethodException {
-        DocumentationOperation operation  = getExceptionMethod("exceptionMethodA");
+        Operation operation  = getExceptionMethod("exceptionMethodA");
         List<DocumentationError> errors = operation.getErrorResponses();
         assertThat(errors.size(), equalTo(2));
         DocumentationError error = errors.get(0);
@@ -123,7 +123,7 @@ public class OperationReaderTest {
 
     @Test
     public void detectsErrorsUsingThrowsDeclaration() throws NoSuchMethodException {
-        DocumentationOperation operation  = getExceptionMethod("exceptionMethodC");
+        Operation operation  = getExceptionMethod("exceptionMethodC");
         List<DocumentationError> errors = operation.getErrorResponses();
         assertThat(errors.size(), equalTo(1));
         DocumentationError error = errors.get(0);
@@ -133,7 +133,7 @@ public class OperationReaderTest {
 
     @Test
     public void detectsApiErrorsDeclaredWithSpringMvcApiErrorList() throws NoSuchMethodException {
-        DocumentationOperation operation  = getExceptionMethod("exceptionMethodD");
+        Operation operation  = getExceptionMethod("exceptionMethodD");
         List<DocumentationError> errors = operation.getErrorResponses();
         assertThat(errors.size(), equalTo(2));
         DocumentationError error = errors.get(0);
@@ -143,7 +143,7 @@ public class OperationReaderTest {
 
     @Test
     public void responseClass() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
         assertThat(operation.getResponseClass(), equalToIgnoringCase("Pet"));
     }
@@ -167,21 +167,21 @@ public class OperationReaderTest {
                return false;
             }
         });
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation,
+        Operation operation = methodReader.readOperation(controllerDocumentation,
                 handlerMethodWithNoParam, paramsCondition, RequestMethod.GET);
         assertThat(operation.getResponseClass(), equalTo("Void"));
     }
 
     @Test
     public void requestParamRequired() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
         assertEquals(false, operation.getParameters().get(4).getRequired());
     }
 
     @Test
     public void paramType1() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod,
                 new ParamsRequestCondition(), RequestMethod.GET);
         assertEquals("path", operation.getParameters().get(0).getParamType());
         assertEquals("path", operation.getParameters().get(1).getParamType());
@@ -191,13 +191,13 @@ public class OperationReaderTest {
 
     @Test
     public void paramType() {
-        DocumentationOperation operation = methodReader.readOperation(controllerDocumentation, handlerMethod2,
+        Operation operation = methodReader.readOperation(controllerDocumentation, handlerMethod2,
                 new ParamsRequestCondition(), RequestMethod.POST);
         assertEquals("body", operation.getParameters().get(0).getParamType());
     }
 
     /// TEST SUPPORT
-    private DocumentationOperation getExceptionMethod(String methodName) throws NoSuchMethodException {
+    private Operation getExceptionMethod(String methodName) throws NoSuchMethodException {
         SampleClass instance = new SampleClass();
         Method method = instance.getClass().getMethod(methodName);
         handlerMethod = new HandlerMethod(instance, method);

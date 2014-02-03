@@ -3,7 +3,6 @@ package com.mangofactory.swagger.models;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.SwaggerConfiguration;
-import com.wordnik.swagger.core.DocumentationSchema;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ import static com.mangofactory.swagger.models.ResolvedTypes.*;
 import static org.junit.Assert.*;
 
 public class SimpleModelTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     class SimpleType {
         byte aByte;
@@ -126,25 +125,25 @@ public class SimpleModelTest {
     @Test
     public void hasASimpleTypeModel() {
         assertTrue(modelMap.containsKey("SimpleType"));
-        DocumentationSchema simpleType = modelMap.get("SimpleType");
+        Model simpleType = modelMap.get("SimpleType");
         assertNotNull(simpleType.getProperties());
         assertEquals(10, simpleType.getProperties().size());
     }
 
     @Test
     public void schemaHasAStringProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aString"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aString");
+        Model stringProperty = schema.getProperties().get("aString");
         assertNotNull(stringProperty);
         assertEquals("string", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAByteProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aByte"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aByte");
+        Model stringProperty = schema.getProperties().get("aByte");
         assertNotNull(stringProperty);
         assertEquals("byte", stringProperty.getType());
     }
@@ -152,18 +151,18 @@ public class SimpleModelTest {
 
     @Test
     public void schemaHasABooleanProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aBoolean"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aBoolean");
+        Model stringProperty = schema.getProperties().get("aBoolean");
         assertNotNull(stringProperty);
         assertEquals("boolean", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAIntProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("anInt"));
-        DocumentationSchema stringProperty = schema.getProperties().get("anInt");
+        Model stringProperty = schema.getProperties().get("anInt");
         assertNotNull(stringProperty);
         assertEquals("int", stringProperty.getType());
     }
@@ -171,27 +170,27 @@ public class SimpleModelTest {
 
     @Test
     public void schemaHasALongProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aLong"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aLong");
+        Model stringProperty = schema.getProperties().get("aLong");
         assertNotNull(stringProperty);
         assertEquals("long", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAShortProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aShort"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aShort");
+        Model stringProperty = schema.getProperties().get("aShort");
         assertNotNull(stringProperty);
         assertEquals("int", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAFloatProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aFloat"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aFloat");
+        Model stringProperty = schema.getProperties().get("aFloat");
         assertNotNull(stringProperty);
         assertEquals("float", stringProperty.getType());
     }
@@ -199,27 +198,27 @@ public class SimpleModelTest {
 
     @Test
     public void schemaHasADoubleProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("aDouble"));
-        DocumentationSchema stringProperty = schema.getProperties().get("aDouble");
+        Model stringProperty = schema.getProperties().get("aDouble");
         assertNotNull(stringProperty);
         assertEquals("double", stringProperty.getType());
     }
 
     @Test
     public void schemaHasADateProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("date"));
-        DocumentationSchema stringProperty = schema.getProperties().get("date");
+        Model stringProperty = schema.getProperties().get("date");
         assertNotNull(stringProperty);
         assertEquals("Date", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAnObjectProperty() {
-        DocumentationSchema schema = modelMap.get("SimpleType");
+        Model schema = modelMap.get("SimpleType");
         assertTrue(schema.getProperties().containsKey("anObject"));
-        DocumentationSchema stringProperty = schema.getProperties().get("anObject");
+        Model stringProperty = schema.getProperties().get("anObject");
         assertNotNull(stringProperty);
         assertEquals("any", stringProperty.getType());
     }

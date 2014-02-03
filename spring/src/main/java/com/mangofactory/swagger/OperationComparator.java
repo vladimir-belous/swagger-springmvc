@@ -1,8 +1,8 @@
 package com.mangofactory.swagger;
 
-import com.wordnik.swagger.core.DocumentationOperation;
+import com.wordnik.swagger.model.Operation;
 
 import java.util.Comparator;
 
-public interface OperationComparator extends Comparator<DocumentationOperation> {
+public interface OperationComparator extends Comparator<Operation> {
 }

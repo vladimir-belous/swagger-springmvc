@@ -3,7 +3,7 @@ package com.mangofactory.swagger.models;
 import com.fasterxml.classmate.types.ResolvedArrayType;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 
 import static com.mangofactory.swagger.models.ResolvedTypes.modelName;
 
@@ -25,20 +25,20 @@ public class ResolvedArrayMemberVisitor implements MemberVisitor {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public DocumentationSchema schema(MemberInfoSource member) {
+    public Model schema(MemberInfoSource member) {
         Preconditions.checkArgument(member.getResolvedType() instanceof ResolvedArrayType);
         if (context.getSchemaMap().containsKey(member.getType().getSimpleName())) {
-            DocumentationSchema schema = new DocumentationSchema();
+            Model schema = new Model();
             schema.setType(modelName(member.getResolvedType()));
             schema.setName(member.getName());
             return schema;
         }
         ResolvedArrayType resolvedArrayType = (ResolvedArrayType) member.getResolvedType();
-        DocumentationSchema schema = new DocumentationSchema();
+        Model schema = new Model();
         schema.setType("Array");
         schema.setName(member.getName());
-        DocumentationSchema itemSchema = context.schema(resolvedArrayType.getArrayElementType());
-        DocumentationSchema itemSchemaRef = new DocumentationSchema();
+        Model itemSchema = context.schema(resolvedArrayType.getArrayElementType());
+        Model itemSchemaRef = new Model();
         itemSchemaRef.ref_$eq(itemSchema.getType());
         schema.setItems(itemSchemaRef);
         return schema;

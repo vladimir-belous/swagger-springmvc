@@ -16,8 +16,8 @@ import com.mangofactory.swagger.spring.filters.ParameterFilter;
 import com.wordnik.swagger.core.Documentation;
 import com.wordnik.swagger.core.DocumentationEndPoint;
 import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Operation;
+import com.wordnik.swagger.core.Parameter;
 import org.springframework.ui.ModelMap;
 
 import javax.servlet.ServletContext;
@@ -39,12 +39,12 @@ public class DefaultConfigurationModule {
         Filter<DocumentationEndPoint> annotationEndpointFilter = new AnnotatedEndpointFilter();
         configuration.getEndpointFilters().addAll(newArrayList(endPointFilter, annotationEndpointFilter));
 
-        Filter<DocumentationOperation> operationFilter = new OperationFilter();
-        Filter<DocumentationOperation> annotatedOperationFilter = new AnnotatedOperationFilter();
+        Filter<Operation> operationFilter = new OperationFilter();
+        Filter<Operation> annotatedOperationFilter = new AnnotatedOperationFilter();
         configuration.getOperationFilters().addAll(newArrayList(operationFilter, annotatedOperationFilter));
 
-        Filter<DocumentationParameter> parameterFilter = new ParameterFilter();
-        Filter<DocumentationParameter> annotatedParameterFilter = new AnnotatedParameterFilter();
+        Filter<Parameter> parameterFilter = new ParameterFilter();
+        Filter<Parameter> annotatedParameterFilter = new AnnotatedParameterFilter();
         configuration.getParameterFilters().addAll(newArrayList(parameterFilter, annotatedParameterFilter));
 
         Filter<List<DocumentationError>> errorFilter = new ErrorsFilter();

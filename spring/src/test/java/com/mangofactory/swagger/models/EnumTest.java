@@ -3,7 +3,7 @@ package com.mangofactory.swagger.models;
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.SwaggerConfiguration;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 public class EnumTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     enum ExampleEnum {
         ONE,
@@ -52,7 +52,7 @@ public class EnumTest {
     @Test
     public void hasAnExampleEnumModel() {
         assertTrue(modelMap.containsKey("ExampleEnum"));
-        DocumentationSchema exampleEnum = modelMap.get("ExampleEnum");
+        Model exampleEnum = modelMap.get("ExampleEnum");
         assertThat(exampleEnum.getProperties().size(), is(0));
         assertTrue(exampleEnum.getAllowableValues() instanceof DocumentationAllowableListValues);
         assertEquals(2, ((DocumentationAllowableListValues) exampleEnum.getAllowableValues()).getValues().size());
@@ -61,16 +61,16 @@ public class EnumTest {
     @Test
     public void hasAnExampleModel() {
         assertTrue(modelMap.containsKey("ExampleWithEnums"));
-        DocumentationSchema exampleWithEnums = modelMap.get("ExampleWithEnums");
+        Model exampleWithEnums = modelMap.get("ExampleWithEnums");
         assertNotNull(exampleWithEnums.getProperties());
         assertEquals(1, exampleWithEnums.getProperties().size());
     }
 
     @Test
     public void exampleWithEnumsHasAnEnumProperty() {
-        DocumentationSchema schema = modelMap.get("ExampleWithEnums");
+        Model schema = modelMap.get("ExampleWithEnums");
         assertTrue(schema.getProperties().containsKey("exampleEnum"));
-        DocumentationSchema anEnum = schema.getProperties().get("exampleEnum");
+        Model anEnum = schema.getProperties().get("exampleEnum");
         assertNotNull(anEnum);
         assertEquals("ExampleEnum", anEnum.getType());
     }

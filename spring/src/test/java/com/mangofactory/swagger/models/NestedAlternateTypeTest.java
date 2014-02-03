@@ -3,7 +3,7 @@ package com.mangofactory.swagger.models;
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.SwaggerConfiguration;
 import com.mangofactory.swagger.spring.filters.OperationFilterTest;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ import static com.mangofactory.swagger.models.ResolvedTypes.*;
 import static org.junit.Assert.*;
 
 public class NestedAlternateTypeTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     class TypeWithNestedAlternate {
        URI alternateType;
@@ -46,7 +46,7 @@ public class NestedAlternateTypeTest {
     @Test
     public void model_is_populated_correctly() {
         assertTrue(modelMap.containsKey("TypeWithNestedAlternate"));
-        DocumentationSchema typeWithNestedAlt = modelMap.get("TypeWithNestedAlternate");
+        Model typeWithNestedAlt = modelMap.get("TypeWithNestedAlternate");
         assertNotNull(typeWithNestedAlt.getProperties());
         assertEquals(1, typeWithNestedAlt.getProperties().size());
         assertTrue(modelMap.containsKey("MyUrl"));

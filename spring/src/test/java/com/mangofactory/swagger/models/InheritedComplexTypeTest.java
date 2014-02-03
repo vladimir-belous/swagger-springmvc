@@ -2,7 +2,7 @@ package com.mangofactory.swagger.models;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.SwaggerConfiguration;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import static com.mangofactory.swagger.models.ResolvedTypes.asResolvedType;
 import static org.junit.Assert.*;
 
 public class InheritedComplexTypeTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     class Named {
         String name;
@@ -76,7 +76,7 @@ public class InheritedComplexTypeTest {
     @Test
     public void hasAPetModel() {
         assertTrue(modelMap.containsKey("Pet"));
-        DocumentationSchema pet = modelMap.get("Pet");
+        Model pet = modelMap.get("Pet");
         assertNotNull(pet.getProperties());
         assertEquals(3, pet.getProperties().size());
     }
@@ -84,41 +84,41 @@ public class InheritedComplexTypeTest {
     @Test
     public void hasACategoryModel() {
         assertTrue(modelMap.containsKey("Category"));
-        DocumentationSchema category = modelMap.get("Category");
+        Model category = modelMap.get("Category");
         assertNotNull(category.getProperties());
         assertEquals(1, category.getProperties().size());
     }
 
     @Test
     public void schemaHasAStringProperty() {
-        DocumentationSchema schema = modelMap.get("Pet");
+        Model schema = modelMap.get("Pet");
         assertTrue(schema.getProperties().containsKey("name"));
-        DocumentationSchema stringProperty = schema.getProperties().get("name");
+        Model stringProperty = schema.getProperties().get("name");
         assertNotNull(stringProperty);
         assertEquals("string", stringProperty.getType());
     }
 
     @Test
     public void schemaHasAIntProperty() {
-        DocumentationSchema schema = modelMap.get("Pet");
+        Model schema = modelMap.get("Pet");
         assertTrue(schema.getProperties().containsKey("age"));
-        DocumentationSchema stringProperty = schema.getProperties().get("age");
+        Model stringProperty = schema.getProperties().get("age");
         assertNotNull(stringProperty);
         assertEquals("int", stringProperty.getType());
     }
 
     @Test
     public void schemaHasACategoryProperty() {
-        DocumentationSchema schema = modelMap.get("Pet");
+        Model schema = modelMap.get("Pet");
         assertTrue(schema.getProperties().containsKey("category"));
-        DocumentationSchema stringProperty = schema.getProperties().get("category");
+        Model stringProperty = schema.getProperties().get("category");
         assertNotNull(stringProperty);
         assertEquals("Category", stringProperty.getType());
     }
 
     @Test
     public void hasACategoryNameProperty() {
-        DocumentationSchema category = modelMap.get("Category");
+        Model category = modelMap.get("Category");
         assertTrue(category.getProperties().containsKey("name"));
     }
 

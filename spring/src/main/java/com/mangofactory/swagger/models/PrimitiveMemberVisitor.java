@@ -1,7 +1,7 @@
 package com.mangofactory.swagger.models;
 
 import com.google.common.base.Function;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 
 public class PrimitiveMemberVisitor implements MemberVisitor {
     private static MemberVisitor instance = new PrimitiveMemberVisitor();
@@ -16,7 +16,7 @@ public class PrimitiveMemberVisitor implements MemberVisitor {
     }
 
     @Override
-    public DocumentationSchema schema(MemberInfoSource member) {
+    public Model schema(MemberInfoSource member) {
         Class<?> returnType = member.getType();
         String propertyType;
         if (returnType.isAssignableFrom(int.class) || returnType.isAssignableFrom(Integer.class)
@@ -25,7 +25,7 @@ public class PrimitiveMemberVisitor implements MemberVisitor {
         } else {
             propertyType = returnType.getSimpleName().toLowerCase();
         }
-        DocumentationSchema propertySchema = new DocumentationSchema();
+        Model propertySchema = new Model();
         propertySchema.setName(member.getName());
         propertySchema.setType(propertyType);
         return propertySchema;

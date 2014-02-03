@@ -6,8 +6,8 @@ import com.mangofactory.swagger.models.TypeProcessingRule;
 import com.wordnik.swagger.core.Documentation;
 import com.wordnik.swagger.core.DocumentationEndPoint;
 import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Operation;
+import com.wordnik.swagger.core.Parameter;
 
 import java.util.List;
 
@@ -32,10 +32,10 @@ public class ExtensibilityModule {
     protected void customizeErrorFilters(List<Filter<List<DocumentationError>>> errorFilters) {
     }
 
-    protected void customizeParameterFilters(List<Filter<DocumentationParameter>> parameterFilters) {
+    protected void customizeParameterFilters(List<Filter<Parameter>> parameterFilters) {
     }
 
-    protected void customizeOperationFilters(List<Filter<DocumentationOperation>> operationFilters) {
+    protected void customizeOperationFilters(List<Filter<Operation>> operationFilters) {
     }
 
     protected void customizeEndpointFilters(List<Filter<DocumentationEndPoint>> endpointFilters) {

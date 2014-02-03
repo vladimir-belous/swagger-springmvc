@@ -8,7 +8,7 @@ import com.mangofactory.swagger.SwaggerConfiguration;
 import com.mangofactory.swagger.annotations.ApiModel;
 import com.mangofactory.swagger.models.Model;
 import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.core.DocumentationOperation;
+import com.wordnik.swagger.core.Operation;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.web.method.HandlerMethod;
@@ -17,19 +17,19 @@ import static com.google.common.collect.Lists.*;
 import static com.mangofactory.swagger.annotations.Annotations.*;
 import static com.mangofactory.swagger.models.ResolvedTypes.*;
 
-public class AnnotatedOperationFilter implements Filter<DocumentationOperation> {
+public class AnnotatedOperationFilter implements Filter<> {
     private static final Logger LOG = LogManager.getLogger(AnnotatedOperationFilter.class);
 
     @Override
-    public void apply(FilterContext<DocumentationOperation> context) {
-        DocumentationOperation operation = context.subject();
+    public void apply(FilterContext<Operation> context) {
+        Operation operation = context.subject();
         HandlerMethod handlerMethod = context.get("handlerMethod");
         ControllerDocumentation controllerDocumentation = context.get("controllerDocumentation");
         SwaggerConfiguration swaggerConfiguration  = context.get("swaggerConfiguration");
         documentOperation(controllerDocumentation, operation, handlerMethod, swaggerConfiguration);
     }
 
-    private void documentOperation(ControllerDocumentation controllerDocumentation, DocumentationOperation operation,
+    private void documentOperation(ControllerDocumentation controllerDocumentation, Operation operation,
                                    HandlerMethod handlerMethod, SwaggerConfiguration configuration) {
 
         ApiOperation apiOperation = handlerMethod.getMethodAnnotation(ApiOperation.class);

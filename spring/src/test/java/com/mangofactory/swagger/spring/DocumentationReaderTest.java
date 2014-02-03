@@ -5,7 +5,7 @@ import com.mangofactory.swagger.spring.controller.DocumentationController;
 import com.mangofactory.swagger.spring.sample.configuration.ServicesTestConfiguration;
 import com.wordnik.swagger.core.Documentation;
 import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationOperation;
+import com.wordnik.swagger.core.Operation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,7 +87,7 @@ public class DocumentationReaderTest {
 
 
         String requestUri = "/features/allMethodsAllowed";
-        DocumentationOperation operation = petsDocumentation.getEndPoint(requestUri, RequestMethod.GET).iterator().next();
+        Operation operation = petsDocumentation.getEndPoint(requestUri, RequestMethod.GET).iterator().next();
         assertThat(operation, is(notNullValue()));
         operation = petsDocumentation.getEndPoint(requestUri, RequestMethod.POST).iterator().next();
         assertThat(operation, is(notNullValue()));
@@ -103,8 +103,8 @@ public class DocumentationReaderTest {
         resourceListing = controller.getResourceListing();
 
         ControllerDocumentation documentation = controller.getApiDocumentation(request);
-        List<DocumentationOperation> endPoint = documentation.getEndPoint("/businesses/vanilla/{businessId}", RequestMethod.GET);
-        DocumentationOperation operation = endPoint.iterator().next();
+        List<Operation> endPoint = documentation.getEndPoint("/businesses/vanilla/{businessId}", RequestMethod.GET);
+        Operation operation = endPoint.iterator().next();
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().size(), equalTo(1));
         assertThat(operation.getSummary(), equalTo("get Vanilla Path Variable"));
@@ -113,7 +113,7 @@ public class DocumentationReaderTest {
 //    @Test
 //    public void findsExpectedMethods() {
 //        ControllerDocumentation petsDocumentation = controller.getApiDocumentation(request);
-//        DocumentationOperation operation = petsDocumentation.getEndPoint("/pets/{petId}",
+//        Operation operation = petsDocumentation.getEndPoint("/pets/{petId}",
 //                RequestMethod.GET).iterator().next();
 //        assertThat(operation, is(notNullValue()));
 //        assertThat(operation.getParameters().size(), equalTo(1));

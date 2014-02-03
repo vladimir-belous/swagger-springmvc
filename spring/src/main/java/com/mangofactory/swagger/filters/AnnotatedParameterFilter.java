@@ -9,7 +9,7 @@ import com.mangofactory.swagger.spring.AllowableRangesParser;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
 import com.wordnik.swagger.core.DocumentationAllowableValues;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.model.Parameter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -23,11 +23,11 @@ import static com.mangofactory.swagger.annotations.Annotations.*;
 import static com.mangofactory.swagger.models.ResolvedTypes.*;
 import static java.lang.String.*;
 
-public class AnnotatedParameterFilter implements Filter<DocumentationParameter> {
+public class AnnotatedParameterFilter implements Filter<Parameter> {
     private static final Logger LOG = LogManager.getLogger(AnnotatedParameterFilter.class);
     @Override
-    public void apply(FilterContext<DocumentationParameter> context) {
-        DocumentationParameter parameter = context.subject();
+    public void apply(FilterContext<Parameter> context) {
+        Parameter parameter = context.subject();
         MethodParameter methodParameter = context.get("methodParameter");
         ControllerDocumentation controllerDocumentation = context.get("controllerDocumentation");
         ResolvedType resolvedType = context.get("parameterType");
@@ -35,7 +35,7 @@ public class AnnotatedParameterFilter implements Filter<DocumentationParameter> 
         documentParameter(controllerDocumentation, parameter, methodParameter, resolvedType);
     }
 
-    private void documentParameter(ControllerDocumentation controllerDocumentation, DocumentationParameter parameter,
+    private void documentParameter(ControllerDocumentation controllerDocumentation, Parameter parameter,
                                    MethodParameter methodParameter, ResolvedType resolvedType) {
 
         ApiParam apiParam = methodParameter.getParameterAnnotation(ApiParam.class);

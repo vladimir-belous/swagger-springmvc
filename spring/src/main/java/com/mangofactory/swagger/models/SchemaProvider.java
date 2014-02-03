@@ -12,7 +12,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.mangofactory.swagger.AliasedResolvedField;
 import com.mangofactory.swagger.SwaggerConfiguration;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -51,7 +51,7 @@ public class SchemaProvider {
             .put(ResolvedInterfaceType.class, ResolvedTypeMemberVisitor.factory())
             .build();
 
-    private final HashMap<String,DocumentationSchema> schemaMap = newHashMap();
+    private final HashMap<String,Model> schemaMap = newHashMap();
     private final SwaggerConfiguration configuration;
     private final SchemaDescriptor descriptor;
     private final TypeResolver typeResolver;
@@ -66,18 +66,18 @@ public class SchemaProvider {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public DocumentationSchema schema(ResolvedField field) {
+    public Model schema(ResolvedField field) {
         ResolvedFieldInfo memberInfo = new ResolvedFieldInfo(configuration, field);
         return findKey(field).apply(this).schema(memberInfo);
     }
 
     @SuppressWarnings("ConstantConditions")
-    public DocumentationSchema schema(ResolvedPropertyInfo property) {
+    public Model schema(ResolvedPropertyInfo property) {
         return findKey(property).apply(this).schema(property);
     }
 
     @SuppressWarnings("ConstantConditions")
-    public DocumentationSchema schema(ResolvedType resolvedType) {
+    public Model schema(ResolvedType resolvedType) {
         ResolvedType alternate = configuration.maybeGetAlternateType(resolvedType);
         ResolvedTypeMemberSource memberSource = new ResolvedTypeMemberSource(alternate);
         return findKey(alternate).apply(this).schema(memberSource);
@@ -106,7 +106,7 @@ public class SchemaProvider {
         return propertySchemas.get(resolvedType.getClass());
     }
 
-    public HashMap<String, DocumentationSchema> getSchemaMap() {
+    public HashMap<String, com.wordnik.swagger.model.Model> getSchemaMap() {
         return schemaMap;
     }
 
@@ -135,7 +135,7 @@ public class SchemaProvider {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public DocumentationSchema generateCustomSchema(ResolvedType resolvedType) {
+    public Model generateCustomSchema(ResolvedType resolvedType) {
         return findKey(resolvedType.getErasedType()).apply(this).schema(new ResolvedTypeMemberSource(resolvedType));
     }
 }

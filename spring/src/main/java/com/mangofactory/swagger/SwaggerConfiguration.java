@@ -3,18 +3,28 @@ package com.mangofactory.swagger;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
+import com.mangofactory.swagger.configuration.DefaultConfigurationModule;
+import com.mangofactory.swagger.configuration.ExtensibilityModule;
 import com.mangofactory.swagger.filters.Filter;
 import com.mangofactory.swagger.filters.FilterContext;
 import com.mangofactory.swagger.models.DocumentationSchemaProvider;
 import com.mangofactory.swagger.models.TypeProcessingRule;
-import com.wordnik.swagger.core.Documentation;
-import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.model.ApiInfo;
+import com.wordnik.swagger.model.ApiListing;
+import com.wordnik.swagger.model.ApiListingReference;
+import com.wordnik.swagger.model.AuthorizationType;
+import com.wordnik.swagger.model.Operation;
+import com.wordnik.swagger.model.Parameter;
+import com.wordnik.swagger.model.ResourceListing;
+import com.wordnik.swagger.model.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
+import scala.Option;
+import scala.collection.mutable.ListBuffer;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 import static com.google.common.base.Strings.*;
@@ -24,6 +34,7 @@ import static com.mangofactory.swagger.filters.Filters.Fn.*;
 import static com.mangofactory.swagger.models.ResolvedTypes.*;
 import static com.mangofactory.swagger.models.WildcardType.*;
 
+@Component
 public class SwaggerConfiguration {
     public static final String API_DOCS_PATH = "/api-docs";
     public static final String SWAGGER_VERSION = "1.0";
@@ -31,31 +42,42 @@ public class SwaggerConfiguration {
     private final String documentationBasePath;
     private final String swaggerVersion;
 
-    private final List<Filter<Documentation>> documentationFilters = newArrayList();
-    private final List<Filter<DocumentationEndPoint>> endpointFilters = newArrayList();
-    private final List<Filter<DocumentationOperation>> operationFilters = newArrayList();
-    private final List<Filter<DocumentationParameter>> parameterFilters = newArrayList();
-    private final List<Filter<List<DocumentationError>>> errorFilters = newArrayList();
+    private final List<Filter<ResourceListing>> documentationFilters = newArrayList();
+    private final List<Filter<ApiListing>> endpointFilters = newArrayList();
+    private final List<Filter<Operation>> operationFilters = newArrayList();
+    private final List<Filter<Parameter>> parameterFilters = newArrayList();
+    private final List<Filter<List<ResponseMessage>>> errorFilters = newArrayList();
     private final List<TypeProcessingRule> typeProcessingRules = newArrayList();
 
     @Autowired private DocumentationTransformer documentationTransformer;
     @Autowired private DocumentationSchemaProvider schemaProvider;
     @Autowired private TypeResolver typeResolver;
+    @Autowired private DefaultConfigurationModule defaultConfig;
+    @Autowired private ExtensibilityModule extensibility;
 
     private String apiVersion;
     private String basePath;
     private List<String> excludedResources = newArrayList();
 
-    public SwaggerConfiguration(String apiVersion, String basePath) {
+    @PostConstruct
+    public void applyCustomizations() {
+        SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration(apiVersion, basePath);
+        extensibility.apply(defaultConfig.apply(swaggerConfiguration));
+    }
+
+    @Autowired
+    public SwaggerConfiguration(@Value("${documentation.services.version}") String apiVersion,
+                                @Value("${documentation.services.basePath}") String basePath) {
         this.swaggerVersion = SWAGGER_VERSION;
         this.documentationBasePath = API_DOCS_PATH;
         this.basePath = basePath;
         this.apiVersion = apiVersion;
     }
 
-    public Documentation newDocumentation(WebApplicationContext webApplicationContext) {
-        FilterContext<Documentation> context = new FilterContext<Documentation>(new Documentation(null, swaggerVersion,
-                basePath, null));
+    public ResourceListing newDocumentation(WebApplicationContext webApplicationContext) {
+        FilterContext<ResourceListing> context = new FilterContext<ResourceListing>(new ResourceListing(apiVersion,
+                swaggerVersion, new ListBuffer<ApiListingReference>().readOnly(), new ListBuffer<AuthorizationType>()
+                .readOnly(), Option.<ApiInfo>empty()));
         context.put("swagger", this);
         context.put("webApplicationContext", webApplicationContext);
         applyFilters(documentationFilters, context);
@@ -149,23 +171,23 @@ public class SwaggerConfiguration {
         this.basePath = basePath;
     }
 
-    public List<Filter<Documentation>> getDocumentationFilters() {
+    public List<Filter<ResourceListing>> getDocumentationFilters() {
         return documentationFilters;
     }
 
-    public List<Filter<DocumentationEndPoint>> getEndpointFilters() {
+    public List<Filter<ApiListing>> getEndpointFilters() {
         return endpointFilters;
     }
 
-    public List<Filter<DocumentationOperation>> getOperationFilters() {
+    public List<Filter<Operation>> getOperationFilters() {
         return operationFilters;
     }
 
-    public List<Filter<DocumentationParameter>> getParameterFilters() {
+    public List<Filter<Parameter>> getParameterFilters() {
         return parameterFilters;
     }
 
-    public List<Filter<List<DocumentationError>>> getErrorFilters() {
+    public List<Filter<List<ResponseMessage>>> getErrorFilters() {
         return errorFilters;
     }
 

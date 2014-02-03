@@ -1,7 +1,7 @@
 package com.mangofactory.swagger.models;
 
 import com.google.common.base.Function;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 
 public class ObjectMemberVisitor implements MemberVisitor {
     private static MemberVisitor instance = new ObjectMemberVisitor();
@@ -16,8 +16,8 @@ public class ObjectMemberVisitor implements MemberVisitor {
     }
 
     @Override
-    public DocumentationSchema schema(MemberInfoSource member) {
-        DocumentationSchema propertySchema = new DocumentationSchema();
+    public Model schema(MemberInfoSource member) {
+        Model propertySchema = new Model();
         propertySchema.setName(member.getName());
         return propertySchema;
     }

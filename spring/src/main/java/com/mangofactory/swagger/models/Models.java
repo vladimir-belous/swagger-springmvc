@@ -4,7 +4,6 @@ import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.types.ResolvedArrayType;
 import com.google.common.base.Function;
 import com.mangofactory.swagger.ControllerDocumentation;
-import com.wordnik.swagger.core.DocumentationSchema;
 
 import java.util.Date;
 import java.util.Map;
@@ -16,12 +15,12 @@ public class Models {
         private Fn() {
             throw new UnsupportedOperationException();
         }
-        public static Function<Model, Map<String, DocumentationSchema>>
+        public static Function<Model, Map<String, com.wordnik.swagger.model.Model>>
             modelToSchema(final DocumentationSchemaProvider provider) {
 
-            return new Function<Model, Map<String, DocumentationSchema>>() {
+            return new Function<Model, Map<String, com.wordnik.swagger.model.Model>>() {
                 @Override
-                public Map<String, DocumentationSchema> apply(Model input) {
+                public Map<String, com.wordnik.swagger.model.Model> apply(Model input) {
                     return provider.getModelMap(input);
                 }
             };

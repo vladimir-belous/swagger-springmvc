@@ -1,17 +1,20 @@
 package com.mangofactory.swagger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.wordnik.swagger.core.Documentation;
-import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationOperation;
+import com.wordnik.swagger.model.ApiDescription;
+import com.wordnik.swagger.model.ApiListing;
+import com.wordnik.swagger.model.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
+import scala.collection.JavaConversions;
 
 import java.util.Collections;
 import java.util.Comparator;
 
 public abstract class DocumentationTransformer {
-    private Comparator<DocumentationEndPoint> endPointComparator;
-    private Comparator<DocumentationOperation> operationComparator;
+    private Comparator<ApiDescription> endPointComparator;
+    private Comparator<Operation> operationComparator;
 
+    @Autowired
     public DocumentationTransformer(EndpointComparator endPointComparator, OperationComparator operationComparator) {
         this.endPointComparator = endPointComparator;
         this.operationComparator = operationComparator;
@@ -25,14 +28,14 @@ public abstract class DocumentationTransformer {
      * provided comparator.
      *
      * The simplest form of extensibility is providing an Comparator&lt;DocumentationEndpoint&gt; and/or
-     * a Comparator&lt;DocumentationOperation&gt; via the swagger configuration extensions
+     * a Comparator&lt;Operation&gt; via the swagger configuration extensions
      */
-    public Documentation applySorting(Documentation transformed) {
-        if (endPointComparator != null && transformed.getApis() != null) {
-            Collections.sort(transformed.getApis(), endPointComparator);
-            for (DocumentationEndPoint endpoint : transformed.getApis()) {
-                if (operationComparator != null && endpoint.getOperations() != null) {
-                    Collections.sort(endpoint.getOperations(), operationComparator);
+    public ApiListing applySorting(ApiListing transformed) {
+        if (endPointComparator != null && transformed.apis() != null) {
+            Collections.sort(JavaConversions.asJavaList(transformed.apis()), endPointComparator);
+            for (ApiDescription endpoint : JavaConversions.asJavaList(transformed.apis())) {
+                if (operationComparator != null && endpoint.operations() != null) {
+                    Collections.sort(JavaConversions.asJavaList(endpoint.operations()), operationComparator);
                 }
             }
         }
@@ -47,15 +50,15 @@ public abstract class DocumentationTransformer {
      * For e.g. this extensibility can be used to group operations in a different way rather than the default
      * controller based grouping.
      */
-    public abstract Documentation applyTransformation(Documentation documentation);
+    public abstract ApiListing applyTransformation(ApiListing documentation);
 
     @VisibleForTesting
-    void setEndPointComparator(Comparator<DocumentationEndPoint> endPointComparator) {
+    void setEndPointComparator(Comparator<ApiDescription> endPointComparator) {
         this.endPointComparator = endPointComparator;
     }
 
     @VisibleForTesting
-    void setOperationComparator(Comparator<DocumentationOperation> operationComparator) {
+    void setOperationComparator(Comparator<Operation> operationComparator) {
         this.operationComparator = operationComparator;
     }
 }

@@ -6,8 +6,8 @@ import com.mangofactory.swagger.SwaggerConfiguration;
 import com.mangofactory.swagger.filters.FilterContext;
 import com.mangofactory.swagger.models.AlternateTypeProcessingRule;
 import com.mangofactory.swagger.models.DocumentationSchemaProvider;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
+import com.wordnik.swagger.model.Operation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +21,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 
 import static com.google.common.collect.Lists.*;
-import static com.mangofactory.swagger.models.IgnorableTypeRule.ignorable;
-import static org.hamcrest.Matchers.hasKey;
+import static com.mangofactory.swagger.models.IgnorableTypeRule.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -75,16 +75,16 @@ public class OperationFilterTest {
     }
     private ControllerDocumentation controllerDocumentation;
 
-    private FilterContext<DocumentationOperation> context;
+    private FilterContext<Operation> context;
     @Mock private MethodParameter ignoredMethodParameter;
     @Mock private MethodParameter notIgnoredMethodParameter;
 
     @Before
     public void setup() throws Exception {
-        DocumentationOperation operation = new DocumentationOperation();
+        Operation operation = new Operation();
         controllerDocumentation= new ControllerDocumentation("", "", "", "",
                 new DocumentationSchemaProvider(new TypeResolver(), new SwaggerConfiguration("1.1", "/")));
-        context = new FilterContext<DocumentationOperation>(operation);
+        context = new FilterContext<Operation>(operation);
         context.put("controllerDocumentation", controllerDocumentation);
 
         SwaggerConfiguration configuration = new SwaggerConfiguration("2.0", "/some-path");
@@ -118,10 +118,10 @@ public class OperationFilterTest {
         filter.apply(context);
         assertEquals(1, controllerDocumentation.getModels().size());
         assertThat(controllerDocumentation.getModels(), hasKey("MyUrl"));
-        DocumentationSchema myUrl = controllerDocumentation.getModels().get("MyUrl");
-        assertEquals(myUrl.getProperties().size(), 2);
-        assertThat(myUrl.getProperties(), hasKey("host"));
-        assertThat(myUrl.getProperties(), hasKey("port"));
+        Model myUrl = controllerDocumentation.getModels().get("MyUrl");
+        assertEquals(myUrl.properties().size(), 2);
+        assertThat(myUrl.properties(), hasKey("host"));
+        assertThat(myUrl.properties(), hasKey("port"));
     }
 
     @Test

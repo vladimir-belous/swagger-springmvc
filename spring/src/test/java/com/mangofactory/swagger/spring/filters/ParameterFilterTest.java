@@ -8,7 +8,7 @@ import com.mangofactory.swagger.filters.Filter;
 import com.mangofactory.swagger.filters.FilterContext;
 import com.mangofactory.swagger.models.DocumentationSchemaProvider;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.model.Parameter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.MethodParameter;
@@ -86,19 +86,19 @@ public class ParameterFilterTest {
         return new HandlerMethod(sampleController, sampleMethod);
     }
 
-    private DocumentationParameter docParam;
+    private Parameter docParam;
     private ControllerDocumentation documentation;
-    private FilterContext<DocumentationParameter> context;
-    private List<Filter<DocumentationParameter>> paramFilters;
+    private FilterContext<Parameter> context;
+    private List<Filter<Parameter>> paramFilters;
     private static final TypeResolver typeResolver = new TypeResolver();
 
 
     @Before
     public void setup() {
-        docParam = new DocumentationParameter();
+        docParam = new Parameter();
         documentation = new ControllerDocumentation("1", "2", "", "",
                 new DocumentationSchemaProvider(new TypeResolver(), new SwaggerConfiguration("1.1", "/")));
-        context = new FilterContext<DocumentationParameter>(docParam);
+        context = new FilterContext<Parameter>(docParam);
         context.put("controllerDocumentation", documentation);
         paramFilters = newArrayList();
         paramFilters.add(new ParameterFilter());
@@ -111,10 +111,10 @@ public class ParameterFilterTest {
         MethodParameter[] methodParams = handlerMethod.getMethodParameters();
         List<ResolvedType> parameterTypes = methodParameters(typeResolver, handlerMethod.getMethod());
         for (int index = 0; index < methodParams.length; index++) {
-            DocumentationParameter docParam = new DocumentationParameter();
+            Parameter docParam = new Parameter();
             ControllerDocumentation documentation = new ControllerDocumentation("1", "2", "", "",
                     new DocumentationSchemaProvider(new TypeResolver(), new SwaggerConfiguration("1.1", "/")));
-            FilterContext context = new FilterContext<DocumentationParameter>(docParam);
+            FilterContext context = new FilterContext<Parameter>(docParam);
             context.put("controllerDocumentation", documentation);
             context.put("methodParameter", methodParams[index]);
             context.put("parameterType", parameterTypes.get(index));

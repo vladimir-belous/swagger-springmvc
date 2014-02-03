@@ -5,7 +5,7 @@ import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mangofactory.swagger.SwaggerConfiguration;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +19,7 @@ import static com.google.common.collect.Maps.*;
 import static org.junit.Assert.*;
 
 public class GenericTypeTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     class Pet {
         String name;
@@ -77,7 +77,7 @@ public class GenericTypeTest {
     @Test
     public void hasAPetModel() {
         assertTrue(modelMap.containsKey("Pet"));
-        DocumentationSchema pet = modelMap.get("Pet");
+        Model pet = modelMap.get("Pet");
         assertNotNull(pet.getProperties());
         assertEquals(2, pet.getProperties().size());
     }
@@ -85,7 +85,7 @@ public class GenericTypeTest {
     @Test
     public void hasAResponseEntityModel() {
         assertTrue(modelMap.containsKey("ResponseEntity«Pet»"));
-        DocumentationSchema responseEntity = modelMap.get("ResponseEntity«Pet»");
+        Model responseEntity = modelMap.get("ResponseEntity«Pet»");
         assertNotNull(responseEntity.getProperties());
         assertEquals(3, responseEntity.getProperties().size());
     }

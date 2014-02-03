@@ -1,7 +1,7 @@
 package com.mangofactory.swagger.spring;
 
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Operation;
+import com.wordnik.swagger.core.Parameter;
 
 public class UriBuilder {
 
@@ -14,9 +14,9 @@ public class UriBuilder {
         sb.append(uri);
     }
 
-    public static String fromOperation(String basePath, DocumentationOperation operation) {
+    public static String fromOperation(String basePath, Operation operation) {
         UriBuilder builder = new UriBuilder(basePath);
-        for (DocumentationParameter parameter : operation.getParameters()) {
+        for (Parameter parameter : operation.getParameters()) {
             if ("path".equals(parameter.getParamType())) {
                 builder.appendPath(parameter.name());
             } else if ("query".equals(parameter.name())) {

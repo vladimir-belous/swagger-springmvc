@@ -3,7 +3,7 @@ package com.mangofactory.swagger.models;
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.SwaggerConfiguration;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
-import com.wordnik.swagger.core.DocumentationSchema;
+import com.wordnik.swagger.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.*;
 
 public class ArrayTest {
-    private Map<String, DocumentationSchema> modelMap;
+    private Map<String, Model> modelMap;
 
     enum TypeEnum {
         DOG,
@@ -125,14 +125,14 @@ public class ArrayTest {
 
     @Test
     public void hasValidCategoryModel() {
-        DocumentationSchema category = modelMap.get("Category");
+        Model category = modelMap.get("Category");
         assertThat(category.properties().size(), is(1));
         assertThat(category, hasProperty("name", "string"));
     }
 
     @Test
     public void hasValidPetModel() {
-        DocumentationSchema pet = modelMap.get("Pet");
+        Model pet = modelMap.get("Pet");
         assertThat(pet.properties().size(), is(3));
         assertThat(pet, hasProperty("name", "string"));
         assertThat(pet, hasProperty("age", "int"));
@@ -141,7 +141,7 @@ public class ArrayTest {
 
     @Test
     public void hasValidTypeEnumModel() {
-        DocumentationSchema typeEnum = modelMap.get("TypeEnum");
+        Model typeEnum = modelMap.get("TypeEnum");
         assertThat(typeEnum.properties().size(), is(0));
         assertTrue(typeEnum.getAllowableValues() instanceof DocumentationAllowableListValues);
         List<String> values = ((DocumentationAllowableListValues) typeEnum.getAllowableValues()).getValues();
@@ -152,22 +152,22 @@ public class ArrayTest {
 
     @Test
     public void hasValidToTestModel() {
-        DocumentationSchema toTest = modelMap.get("ToTest");
+        Model toTest = modelMap.get("ToTest");
         assertThat(toTest.properties().size(), is(4));
         assertThat(toTest, hasProperty("pets", "Array"));
-        DocumentationSchema petItems = toTest.properties().get("pets");
+        Model petItems = toTest.properties().get("pets");
         assertThat(petItems.getItems().ref(), is("Pet"));
 
         assertThat(toTest, hasProperty("petTypeEnums", "Array"));
-        DocumentationSchema petTypeEnumItems = toTest.properties().get("petTypeEnums");
+        Model petTypeEnumItems = toTest.properties().get("petTypeEnums");
         assertThat(petTypeEnumItems.getItems().ref(), is("TypeEnum"));
 
         assertThat(toTest, hasProperty("years", "Array"));
-        DocumentationSchema yearItems = toTest.properties().get("years");
+        Model yearItems = toTest.properties().get("years");
         assertThat(yearItems.getItems().ref(), is("int"));
 
         assertThat(toTest, hasProperty("names", "Array"));
-        DocumentationSchema nameItems = toTest.properties().get("names");
+        Model nameItems = toTest.properties().get("names");
         assertThat(nameItems.getItems().ref(), is("string"));
     }
 

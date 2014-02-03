@@ -2,7 +2,7 @@ package com.mangofactory.swagger;
 
 import com.wordnik.swagger.core.Documentation;
 import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationOperation;
+import com.wordnik.swagger.core.Operation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,9 +30,9 @@ public class DocumentationTransformerTest {
                 return endPoint.getPath().compareTo(endPoint2.getPath());
             }
         });
-        transformer.setOperationComparator(new Comparator<DocumentationOperation>() {
+        transformer.setOperationComparator(new Comparator<Operation>() {
             @Override
-            public int compare(DocumentationOperation operation, DocumentationOperation operation2) {
+            public int compare(Operation operation, Operation operation2) {
                 return operation.getHttpMethod().compareTo(operation2.getHttpMethod());
             }
         });
@@ -55,7 +55,7 @@ public class DocumentationTransformerTest {
     public void whenApisCollectionHasOneElementWithNonEmptyOperationsCollectionAndNoComparators() {
         Documentation documentation = new Documentation();
         DocumentationEndPoint endPoint = new DocumentationEndPoint("/somepath", "some desc");
-        endPoint.setOperations(newArrayList(new DocumentationOperation("GET", "some method", "some method")));
+        endPoint.setOperations(newArrayList(new Operation("GET", "some method", "some method")));
         documentation.setApis(newArrayList(endPoint));
         transformer.applySorting(documentation);
     }
@@ -80,7 +80,7 @@ public class DocumentationTransformerTest {
         setupComparators(transformer);
         Documentation documentation = new Documentation();
         DocumentationEndPoint endPoint = new DocumentationEndPoint("/somepath", "some desc");
-        endPoint.setOperations(newArrayList(new DocumentationOperation("GET", "some method", "some method")));
+        endPoint.setOperations(newArrayList(new Operation("GET", "some method", "some method")));
         documentation.setApis(newArrayList(endPoint));
         transformer.applySorting(documentation);
     }

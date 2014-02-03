@@ -2,13 +2,14 @@ package com.mangofactory.swagger.filters;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.core.DocumentationEndPoint;
+import com.wordnik.swagger.model.ApiListing;
 
-public class AnnotatedEndpointFilter implements Filter<DocumentationEndPoint> {
+public class AnnotatedEndpointFilter implements Filter<ApiListing> {
     @Override
-    public void apply(FilterContext<DocumentationEndPoint> context) {
-        DocumentationEndPoint doc = context.subject();
+    public void apply(FilterContext<ApiListing> context) {
+        ApiListing doc = context.subject();
         Class<?> controllerClass = context.get("controllerClass");
-        doc.setDescription(getDescription(controllerClass));
+        doc.description(getDescription(controllerClass));
     }
 
 

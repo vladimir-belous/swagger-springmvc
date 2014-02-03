@@ -1,6 +1,6 @@
 package com.mangofactory.swagger;
 
-import com.wordnik.swagger.core.Documentation;
+import com.wordnik.swagger.model.ApiListing;
 
 
 public class DefaultDocumentationTransformer extends DocumentationTransformer {
@@ -11,7 +11,7 @@ public class DefaultDocumentationTransformer extends DocumentationTransformer {
     }
 
     @Override
-    public Documentation applyTransformation(Documentation documentation) {
+    public ApiListing applyTransformation(ApiListing documentation) {
        return documentation;
     }
 }

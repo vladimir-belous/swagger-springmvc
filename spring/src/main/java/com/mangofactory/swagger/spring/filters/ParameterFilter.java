@@ -7,7 +7,7 @@ import com.mangofactory.swagger.filters.Filter;
 import com.mangofactory.swagger.filters.FilterContext;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
 import com.wordnik.swagger.core.DocumentationAllowableValues;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Parameter;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,10 +23,10 @@ import static com.mangofactory.swagger.models.Models.*;
 import static com.mangofactory.swagger.models.ResolvedTypes.*;
 import static com.mangofactory.swagger.spring.Descriptions.*;
 
-public class ParameterFilter implements Filter<DocumentationParameter> {
+public class ParameterFilter implements Filter<Parameter> {
     @Override
-    public void apply(FilterContext<DocumentationParameter> context) {
-        DocumentationParameter parameter = context.subject();
+    public void apply(FilterContext<Parameter> context) {
+        Parameter parameter = context.subject();
         MethodParameter methodParameter = context.get("methodParameter");
         ResolvedType parameterType = context.get("parameterType");
         String defaultParameterName = context.get("defaultParameterName");
@@ -35,7 +35,7 @@ public class ParameterFilter implements Filter<DocumentationParameter> {
         documentParameter(controllerDocumentation, parameter, methodParameter, parameterType, defaultParameterName);
     }
 
-    private void documentParameter(ControllerDocumentation controllerDocumentation, DocumentationParameter parameter,
+    private void documentParameter(ControllerDocumentation controllerDocumentation, Parameter parameter,
         MethodParameter methodParameter, ResolvedType parameterType, String defaultParameterName) {
 
         String name = selectBestParameterName(methodParameter, defaultParameterName);

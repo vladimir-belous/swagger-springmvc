@@ -9,8 +9,8 @@ import com.mangofactory.swagger.filters.FilterContext;
 import com.mangofactory.swagger.filters.Filters;
 import com.wordnik.swagger.core.DocumentationAllowableListValues;
 import com.wordnik.swagger.core.DocumentationError;
-import com.wordnik.swagger.core.DocumentationOperation;
-import com.wordnik.swagger.core.DocumentationParameter;
+import com.wordnik.swagger.core.Operation;
+import com.wordnik.swagger.core.Parameter;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,10 +31,10 @@ public class OperationReader {
         this.configuration = configuration;
     }
 
-    DocumentationOperation readOperation(ControllerDocumentation controllerDocumentation, HandlerMethod handlerMethod,
+    Operation readOperation(ControllerDocumentation controllerDocumentation, HandlerMethod handlerMethod,
                                          ParamsRequestCondition paramsCondition, RequestMethod requestMethod) {
-        DocumentationOperation operation = new DocumentationOperation(requestMethod.name(), "", "");
-        FilterContext<DocumentationOperation> operationContext = new FilterContext<DocumentationOperation>(operation);
+        Operation operation = new Operation(requestMethod.name(), "", "");
+        FilterContext<Operation> operationContext = new FilterContext<Operation>(operation);
         operationContext.put("handlerMethod", handlerMethod);
         operationContext.put("controllerDocumentation", controllerDocumentation);
         operationContext.put("swaggerConfiguration", configuration);
@@ -44,14 +44,14 @@ public class OperationReader {
         MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
         String [] parameterNames = getParameterNames(handlerMethod, methodParameters.length);
         for (int index = 0; index < handlerMethod.getMethodParameters().length; index++) {
-            DocumentationParameter parameter = new DocumentationParameter();
+            Parameter parameter = new Parameter();
             ResolvedType resolvedType = configuration.maybeGetAlternateType(resolvedParameters.get(index));
             if (resolvedParameters.size() == 0
                     || configuration.isParameterTypeIgnorable(resolvedType)) {
                 continue;
             }
-            FilterContext<DocumentationParameter> parameterContext
-                    = new FilterContext<DocumentationParameter>(parameter);
+            FilterContext<Parameter> parameterContext
+                    = new FilterContext<Parameter>(parameter);
             parameterContext.put("methodParameter", methodParameters[index]);
             parameterContext.put("parameterType", resolvedType);
             parameterContext.put("defaultParameterName", parameterNames[index]);
@@ -64,7 +64,7 @@ public class OperationReader {
                     withName(expression.getName()))) {
                 continue;
             }
-            DocumentationParameter parameter = new DocumentationParameter();
+            Parameter parameter = new Parameter();
             parameter.setDataType("String");
             parameter.setName(expression.getName());
             parameter.setDefaultValue(expression.getValue());
@@ -84,7 +84,7 @@ public class OperationReader {
         return operation;
     }
 
-    private Iterable<DocumentationParameter> nullToEmptyList(List<DocumentationParameter> parameters) {
+    private Iterable<Parameter> nullToEmptyList(List<Parameter> parameters) {
         if (parameters == null) {
             return newArrayList();
         }
@@ -104,10 +104,10 @@ public class OperationReader {
         return parameterNames;
     }
 
-    private Predicate<? super DocumentationParameter> withName(final String name) {
-        return new Predicate<DocumentationParameter>() {
+    private Predicate<? super Parameter> withName(final String name) {
+        return new Predicate<Parameter>() {
             @Override
-            public boolean apply(DocumentationParameter input) {
+            public boolean apply(Parameter input) {
                 return Objects.equal(input.getName(), name);
             }
         };
