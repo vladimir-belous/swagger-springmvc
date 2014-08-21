@@ -1,28 +1,65 @@
 package com.mangofactory.swagger.mixins
 import com.fasterxml.classmate.TypeResolver
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.mangofactory.swagger.models.*
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.mangofactory.swagger.models.DefaultModelProvider
+import com.mangofactory.swagger.models.ModelDependencyProvider
+import com.mangofactory.swagger.models.ModelProvider
+import com.mangofactory.swagger.models.ObjectMapperBeanPropertyNamingStrategy
 import com.mangofactory.swagger.models.alternates.AlternateTypeProvider
-import com.mangofactory.swagger.models.configuration.SwaggerModelsConfiguration
+import com.mangofactory.swagger.models.property.bean.AccessorsProvider
+import com.mangofactory.swagger.models.property.bean.BeanModelPropertyProvider
+import com.mangofactory.swagger.models.property.constructor.ConstructorModelPropertyProvider
+import com.mangofactory.swagger.models.property.field.FieldModelPropertyProvider
+import com.mangofactory.swagger.models.property.field.FieldProvider
+import com.mangofactory.swagger.models.property.provider.DefaultModelPropertiesProvider
 
 class ModelProviderSupport {
-  def modelProvider() {
-    def resolver = new TypeResolver()
-    def fields = new FieldsProvider(resolver)
-    SwaggerModelsConfiguration springSwaggerConfig = new SwaggerModelsConfiguration()
-    def alternateTypeProvider = springSwaggerConfig.alternateTypeProvider(new TypeResolver());
-    def accessors = new AccessorsProvider(resolver, alternateTypeProvider)
-    def modelPropertiesProvider = new DefaultModelPropertiesProvider(alternateTypeProvider,
-            accessors, fields)
-    modelPropertiesProvider.setObjectMapper(new ObjectMapper())
-    def modelDependenciesProvider = modelDependencyProvider(resolver, alternateTypeProvider, modelPropertiesProvider)
 
-    new DefaultModelProvider(resolver, alternateTypeProvider, modelPropertiesProvider, modelDependenciesProvider)
+  ModelProvider modelProvider(TypeResolver typeResolver = new TypeResolver(),
+                              AlternateTypeProvider alternateTypeProvider = new AlternateTypeProvider()) {
+
+    def fields = new FieldProvider(typeResolver)
+
+    def objectMapper = new ObjectMapper()
+    def namingStrategy = new ObjectMapperBeanPropertyNamingStrategy(objectMapper)
+
+    def beanModelPropertyProvider = new BeanModelPropertyProvider(new AccessorsProvider(typeResolver), typeResolver,
+            alternateTypeProvider, namingStrategy)
+    def fieldModelPropertyProvider = new FieldModelPropertyProvider(fields, alternateTypeProvider, namingStrategy)
+    def constructorModelPropertyProvider =
+            new ConstructorModelPropertyProvider(fields, alternateTypeProvider, namingStrategy)
+
+    def modelPropertiesProvider = new DefaultModelPropertiesProvider(beanModelPropertyProvider,
+            fieldModelPropertyProvider, constructorModelPropertyProvider)
+
+    modelPropertiesProvider.objectMapper = objectMapper
+    def modelDependenciesProvider = new ModelDependencyProvider(typeResolver, alternateTypeProvider, modelPropertiesProvider)
+    new DefaultModelProvider(typeResolver, alternateTypeProvider, modelPropertiesProvider, modelDependenciesProvider)
   }
 
-  private def modelDependencyProvider(TypeResolver resolver, AlternateTypeProvider alternateTypeProvider,
-      DefaultModelPropertiesProvider modelPropertiesProvider) {
-    new ModelDependencyProvider(resolver, alternateTypeProvider, modelPropertiesProvider)
+  ModelProvider modelProviderWithSnakeCaseNamingStrategy(TypeResolver typeResolver = new TypeResolver(),
+                              AlternateTypeProvider alternateTypeProvider = new AlternateTypeProvider()) {
+
+    def fields = new FieldProvider(typeResolver)
+
+    def objectMapper = new ObjectMapper()
+    objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+    def namingStrategy = new ObjectMapperBeanPropertyNamingStrategy(objectMapper)
+
+    def beanModelPropertyProvider = new BeanModelPropertyProvider(new AccessorsProvider(typeResolver), typeResolver,
+            alternateTypeProvider, namingStrategy)
+    def fieldModelPropertyProvider = new FieldModelPropertyProvider(fields, alternateTypeProvider, namingStrategy)
+    def constructorModelPropertyProvider =
+            new ConstructorModelPropertyProvider(fields, alternateTypeProvider, namingStrategy)
+
+    def modelPropertiesProvider = new DefaultModelPropertiesProvider(beanModelPropertyProvider,
+            fieldModelPropertyProvider, constructorModelPropertyProvider)
+
+    modelPropertiesProvider.objectMapper = objectMapper
+    def modelDependenciesProvider = new ModelDependencyProvider(typeResolver, alternateTypeProvider, modelPropertiesProvider)
+    new DefaultModelProvider(typeResolver, alternateTypeProvider, modelPropertiesProvider, modelDependenciesProvider)
   }
+
 
 }

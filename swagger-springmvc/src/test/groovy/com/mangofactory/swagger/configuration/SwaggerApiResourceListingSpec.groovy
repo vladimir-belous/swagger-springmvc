@@ -4,7 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.mangofactory.swagger.core.ClassOrApiAnnotationResourceGrouping
 import com.mangofactory.swagger.core.SwaggerApiResourceListing
 import com.mangofactory.swagger.core.SwaggerCache
-import com.mangofactory.swagger.models.*
+import com.mangofactory.swagger.mixins.RequestMappingSupport
+import com.mangofactory.swagger.mixins.SpringSwaggerConfigSupport
+import com.mangofactory.swagger.models.DefaultModelProvider
+import com.mangofactory.swagger.models.ModelDependencyProvider
+import com.mangofactory.swagger.models.ModelProvider
+import com.mangofactory.swagger.models.ObjectMapperBeanPropertyNamingStrategy
+import com.mangofactory.swagger.models.property.bean.AccessorsProvider
+import com.mangofactory.swagger.models.property.bean.BeanModelPropertyProvider
+import com.mangofactory.swagger.models.property.constructor.ConstructorModelPropertyProvider
+import com.mangofactory.swagger.models.property.field.FieldModelPropertyProvider
+import com.mangofactory.swagger.models.property.field.FieldProvider
+import com.mangofactory.swagger.models.property.provider.DefaultModelPropertiesProvider
 import com.mangofactory.swagger.ordering.ResourceListingLexicographicalOrdering
 import com.mangofactory.swagger.ordering.ResourceListingPositionalOrdering
 import com.mangofactory.swagger.paths.AbsoluteSwaggerPathProvider
@@ -17,15 +28,13 @@ import spock.lang.Specification
 
 import static com.mangofactory.swagger.ScalaUtils.*
 
-@Mixin([com.mangofactory.swagger.mixins.RequestMappingSupport,
-        com.mangofactory.swagger.mixins.SpringSwaggerConfigSupport])
+@Mixin([RequestMappingSupport, SpringSwaggerConfigSupport])
 class SwaggerApiResourceListingSpec extends Specification {
 
   def "assessors"() {
     given:
-      SwaggerApiResourceListing swaggerApiResourceListing = new SwaggerApiResourceListing(null, null)
       SwaggerCache cache = new SwaggerCache()
-      swaggerApiResourceListing.setSwaggerCache(cache)
+      SwaggerApiResourceListing swaggerApiResourceListing = new SwaggerApiResourceListing(cache, null)
       List<AuthorizationType> authTypes = Arrays.asList(new ApiKey("", ""))
       swaggerApiResourceListing.setAuthorizationTypes(authTypes)
       AbsoluteSwaggerPathProvider provider = new AbsoluteSwaggerPathProvider()
@@ -107,12 +116,20 @@ class SwaggerApiResourceListingSpec extends Specification {
       swaggerApiResourceListing.setSwaggerGlobalSettings(settings)
 
       def resolver = new TypeResolver()
-      def modelPropertiesProvider = new DefaultModelPropertiesProvider(
-              settings.alternateTypeProvider,
-              new AccessorsProvider(resolver, settings.alternateTypeProvider),
-              new FieldsProvider(resolver))
-      modelPropertiesProvider.setObjectMapper(new ObjectMapper())
+      def objectMapper = new ObjectMapper()
+      def fields = new FieldProvider(resolver)
+      def namingStrategy = new ObjectMapperBeanPropertyNamingStrategy(objectMapper)
 
+      def beanModelPropertyProvider = new BeanModelPropertyProvider(new AccessorsProvider(resolver), resolver,
+              settings.alternateTypeProvider, namingStrategy)
+      def fieldModelPropertyProvider =
+              new FieldModelPropertyProvider(fields, settings.alternateTypeProvider, namingStrategy)
+      def constructorModelPropertyProvider = new ConstructorModelPropertyProvider(fields,
+              settings.alternateTypeProvider, namingStrategy)
+
+      def modelPropertiesProvider = new DefaultModelPropertiesProvider(beanModelPropertyProvider,
+              fieldModelPropertyProvider, constructorModelPropertyProvider)
+      modelPropertiesProvider.objectMapper = objectMapper
       def modelDependenciesProvider = new ModelDependencyProvider(resolver, settings.alternateTypeProvider,
               modelPropertiesProvider)
       ModelProvider modelProvider = new DefaultModelProvider(resolver, settings.alternateTypeProvider,
@@ -147,14 +164,7 @@ class SwaggerApiResourceListingSpec extends Specification {
             swaggerCache.swaggerApiListingMap['swaggerGroup']['dummy-class']
       apiListing.swaggerVersion() == '1.2'
       apiListing.basePath() == 'http://localhost:8080/context-path'
-
-      /**
-       * TODO - AK
-       * The relative path to the resource, from the basePath, which this API Specification
-       * piListing.resourcePath() == '/api-docs/swaggerGroup/com_mangofactory_swagger_dummy_DummyClass'
-       */
-      apiListing.resourcePath() == 'fix this'
-
+      apiListing.resourcePath() == '/somePath'
   }
 
   def "Should sort based on position"() {

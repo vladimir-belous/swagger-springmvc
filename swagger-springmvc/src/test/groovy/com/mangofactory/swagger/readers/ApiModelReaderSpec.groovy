@@ -1,11 +1,11 @@
 package com.mangofactory.swagger.readers
-
 import com.fasterxml.classmate.TypeResolver
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig
 import com.mangofactory.swagger.configuration.SwaggerGlobalSettings
 import com.mangofactory.swagger.dummy.DummyModels
 import com.mangofactory.swagger.dummy.controllers.BusinessService
 import com.mangofactory.swagger.dummy.controllers.PetService
+import com.mangofactory.swagger.dummy.models.FoobarDto
 import com.mangofactory.swagger.mixins.ApiOperationSupport
 import com.mangofactory.swagger.mixins.JsonSupport
 import com.mangofactory.swagger.mixins.ModelProviderSupport
@@ -25,9 +25,9 @@ import spock.lang.Specification
 import javax.servlet.http.HttpServletResponse
 
 import static com.mangofactory.swagger.ScalaUtils.*
-import static com.mangofactory.swagger.models.alternates.Alternates.*
+import static com.mangofactory.swagger.models.alternates.Alternates.newRule
 
-@Mixin([RequestMappingSupport, ApiOperationSupport, ModelProviderSupport, JsonSupport])
+@Mixin([RequestMappingSupport, ApiOperationSupport, JsonSupport, ModelProviderSupport])
 class ApiModelReaderSpec extends Specification {
 
   def "Method return type model"() {
@@ -202,7 +202,7 @@ class ApiModelReaderSpec extends Specification {
 
   }
 
-  def "Generates the correct models when alternateTypeProvider returns an ingoreable or base parameter type"() {
+  def "Generates the correct models when alternateTypeProvider returns an ignoreable or base parameter type"() {
     given:
       HandlerMethod handlerMethod = handlerMethodIn(BusinessService, 'getResponseEntity', String)
       RequestMappingContext context =
@@ -228,6 +228,144 @@ class ApiModelReaderSpec extends Specification {
     then:
       Map<String, Model> models = result.get("models")
       models.size() == 0
+
+  }
+
+  def "property description should be populated when type is used in response and request body"() {
+    given:
+      HandlerMethod handlerMethod = dummyHandlerMethod('methodWithSameAnnotatedModelInReturnAndRequestBodyParam',
+              DummyModels.AnnotatedBusinessModel
+      )
+      RequestMappingContext context = new RequestMappingContext(requestMappingInfo('/somePath'), handlerMethod)
+
+      def settings = new SwaggerGlobalSettings()
+      def config = new SpringSwaggerConfig()
+      settings.ignorableParameterTypes = config.defaultIgnorableParameterTypes()
+      def modelConfig = new SwaggerModelsConfiguration()
+      def typeResolver = new TypeResolver()
+      settings.alternateTypeProvider = modelConfig.alternateTypeProvider(typeResolver)
+      context.put("swaggerGlobalSettings", settings)
+
+    when:
+      ApiModelReader apiModelReader = new ApiModelReader(modelProvider())
+      apiModelReader.execute(context)
+      Map<String, Model> result = context.getResult()
+
+    then:
+      Map<String, Model> models = result.get("models")
+      models.size() == 1
+
+      String modelName = DummyModels.AnnotatedBusinessModel.class.simpleName
+      models.containsKey(modelName)
+
+      Model model = models[modelName]
+      Map modelProperties = fromScalaMap(model.properties())
+      modelProperties.containsKey('name')
+
+      ModelProperty nameProperty = modelProperties['name']
+      nameProperty.description().isEmpty() == false
+
+  }
+
+  def "model should include property that is only visible during serialization"() {
+    given:
+      HandlerMethod handlerMethod = dummyHandlerMethod('methodWithSerializeOnlyPropInReturnAndRequestBodyParam',
+              DummyModels.ModelWithSerializeOnlyProperty
+      )
+      RequestMappingContext context = new RequestMappingContext(requestMappingInfo('/somePath'), handlerMethod)
+
+      def settings = new SwaggerGlobalSettings()
+      def config = new SpringSwaggerConfig()
+      settings.ignorableParameterTypes = config.defaultIgnorableParameterTypes()
+      def modelConfig = new SwaggerModelsConfiguration()
+      def typeResolver = new TypeResolver()
+      settings.alternateTypeProvider = modelConfig.alternateTypeProvider(typeResolver)
+      context.put("swaggerGlobalSettings", settings)
+
+    when:
+      ApiModelReader apiModelReader = new ApiModelReader(modelProvider())
+      apiModelReader.execute(context)
+      Map<String, Model> result = context.getResult()
+
+    then:
+      Map<String, Model> models = result.get("models")
+      models.size() == 1
+
+      String modelName = DummyModels.ModelWithSerializeOnlyProperty.class.simpleName
+      models.containsKey(modelName)
+
+      Model model = models[modelName]
+      Map modelProperties = fromScalaMap(model.properties())
+      modelProperties.size() == 2
+      modelProperties.containsKey('visibleForSerialize')
+      modelProperties.containsKey('alwaysVisible')
+
+  }
+
+
+  def "model should include snake_case property that is only visible during serialization when objectMapper has CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES"() {
+    given:
+      HandlerMethod handlerMethod = dummyHandlerMethod('methodWithSerializeOnlyPropInReturnAndRequestBodyParam',
+              DummyModels.ModelWithSerializeOnlyProperty
+      )
+      RequestMappingContext context = new RequestMappingContext(requestMappingInfo('/somePath'), handlerMethod)
+
+      def settings = new SwaggerGlobalSettings()
+      def config = new SpringSwaggerConfig()
+      settings.ignorableParameterTypes = config.defaultIgnorableParameterTypes()
+      def modelConfig = new SwaggerModelsConfiguration()
+      def typeResolver = new TypeResolver()
+      settings.alternateTypeProvider = modelConfig.alternateTypeProvider(typeResolver)
+      context.put("swaggerGlobalSettings", settings)
+
+    when:
+      ApiModelReader apiModelReader = new ApiModelReader(modelProviderWithSnakeCaseNamingStrategy())
+      apiModelReader.execute(context)
+      Map<String, Model> result = context.getResult()
+
+    then:
+      Map<String, Model> models = result.get("models")
+      models.size() == 1
+
+      String modelName = DummyModels.ModelWithSerializeOnlyProperty.class.simpleName
+      models.containsKey(modelName)
+
+      Model model = models[modelName]
+      Map modelProperties = fromScalaMap(model.properties())
+      modelProperties.size() == 2
+      modelProperties.containsKey('visible_for_serialize')
+      modelProperties.containsKey('always_visible')
+
+  }
+
+  def "Test to verify issue #283"() {
+    given:
+      HandlerMethod handlerMethod = dummyHandlerMethod('methodToTestFoobarDto', FoobarDto)
+      RequestMappingContext context = new RequestMappingContext(requestMappingInfo('/somePath'), handlerMethod)
+
+      def settings = new SwaggerGlobalSettings()
+      def config = new SpringSwaggerConfig()
+      settings.ignorableParameterTypes = config.defaultIgnorableParameterTypes()
+      def modelConfig = new SwaggerModelsConfiguration()
+      def typeResolver = new TypeResolver()
+      settings.alternateTypeProvider = modelConfig.alternateTypeProvider(typeResolver)
+      context.put("swaggerGlobalSettings", settings)
+
+    when:
+      ApiModelReader apiModelReader = new ApiModelReader(modelProvider())
+      apiModelReader.execute(context)
+      Map<String, Model> result = context.getResult()
+
+    then:
+      Map<String, Model> models = result.get("models")
+      models.size() == 1
+
+      String modelName = FoobarDto.simpleName
+      models.containsKey(modelName)
+
+      Model model = models[modelName]
+      Map modelProperties = fromScalaMap(model.properties())
+      modelProperties.containsKey('visibleForSerialize')
 
   }
 }

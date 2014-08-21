@@ -12,6 +12,18 @@ class TypesForTestingSupport {
   static Class simpleType() {
     SimpleType
   }
+  static Class typeWithConstructor() {
+    TypeWithConstructor
+  }
+  static Class typeWithConstructorProperty() {
+    TypeWithConstructorProperty
+  }
+  static Class mapsContainer() {
+    MapsContainer
+  }
+  static Class typeWithJsonPropertyAnnotation() {
+    TypeWithJsonProperty
+  }
   static Class complexType() {
     ComplexType
   }
@@ -56,6 +68,11 @@ class TypesForTestingSupport {
   static ResolvedType genericClassWithDeepGenerics() {
     resolver.resolve(GenericType, resolver.resolve(ResponseEntity, resolver.resolve(List, SimpleType)))
   }
+
+  static ResolvedType responseEntityWithDeepGenerics() {
+    resolver.resolve(ResponseEntity, mapsContainer())
+  }
+
   static ResolvedType genericCollectionWithEnum() {
     resolver.resolve(GenericType, resolver.resolve(Collection, ExampleEnum))
   }
@@ -83,6 +100,10 @@ class TypesForTestingSupport {
     TypeWithGettersAndSetters
   }
 
+  static Class typeForTestingAnnotatedGettersAndSetter(){
+    TypeWithAnnotatedGettersAndSetters
+  }
+
   static ResolvedType hashMap(def keyClazz, def valueClazz) {
     resolver.resolve(Map, keyClazz, valueClazz)
   }
@@ -93,5 +114,13 @@ class TypesForTestingSupport {
 
   static ResolvedType typeWithAlternateProperty() {
     resolver.resolve(TypeWithAlternateProperty);
+  }
+
+  static ResolvedType typeWithResponseEntityOfVoid() {
+    resolver.resolve(GenericType, resolver.resolve(ResponseEntity, Void))
+  }
+
+  static ResolvedType nestedGenericType(def clazz) {
+    resolver.resolve(GenericType, resolver.resolve(ResponseEntity, clazz))
   }
 }

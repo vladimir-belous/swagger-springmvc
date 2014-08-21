@@ -3,7 +3,7 @@ package com.mangofactory.swagger.configuration;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.mangofactory.swagger.models.DefaultModelPropertiesProvider;
+import com.mangofactory.swagger.models.property.provider.DefaultModelPropertiesProvider;
 import com.wordnik.swagger.model.ApiListing;
 import com.wordnik.swagger.model.ResourceListing;
 import org.springframework.beans.BeansException;
@@ -36,8 +36,16 @@ public class JacksonSwaggerSupport implements ApplicationContextAware {
   }
 
   @Autowired
-  public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
-    this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
+  public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter[] requestMappingHandlerAdapters) {
+    if (requestMappingHandlerAdapters.length > 1) {
+      for (RequestMappingHandlerAdapter adapter : requestMappingHandlerAdapters) {
+        if (adapter.getClass().getCanonicalName().equals(RequestMappingHandlerAdapter.class.getCanonicalName())) {
+          this.requestMappingHandlerAdapter = adapter;
+        }
+      }
+    } else {
+      requestMappingHandlerAdapter = requestMappingHandlerAdapters[0];
+    }
   }
 
   @PostConstruct
@@ -51,8 +59,8 @@ public class JacksonSwaggerSupport implements ApplicationContextAware {
       }
     }
 
-    Map<String, DefaultModelPropertiesProvider> beans = applicationContext.getBeansOfType
-            (DefaultModelPropertiesProvider.class);
+    Map<String, DefaultModelPropertiesProvider> beans =
+            applicationContext.getBeansOfType(DefaultModelPropertiesProvider.class);
 
     for (DefaultModelPropertiesProvider defaultModelPropertiesProvider : beans.values()) {
       defaultModelPropertiesProvider.setObjectMapper(this.springsMessageConverterObjectMapper);
