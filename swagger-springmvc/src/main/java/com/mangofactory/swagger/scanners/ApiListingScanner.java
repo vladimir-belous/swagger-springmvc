@@ -2,10 +2,12 @@ package com.mangofactory.swagger.scanners;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mangofactory.swagger.authorization.AuthorizationContext;
 import com.mangofactory.swagger.configuration.SwaggerGlobalSettings;
 import com.mangofactory.swagger.core.CommandExecutor;
+import com.mangofactory.swagger.core.RequestMappingEvaluator;
 import com.mangofactory.swagger.core.ResourceGroupingStrategy;
 import com.mangofactory.swagger.models.ModelProvider;
 import com.mangofactory.swagger.ordering.ApiDescriptionLexicographicalOrdering;
@@ -15,14 +17,12 @@ import com.mangofactory.swagger.readers.ApiModelReader;
 import com.mangofactory.swagger.readers.Command;
 import com.mangofactory.swagger.readers.MediaTypeReader;
 import com.mangofactory.swagger.readers.operation.RequestMappingReader;
-import com.wordnik.swagger.core.SwaggerSpec;
-import com.wordnik.swagger.model.ApiDescription;
-import com.wordnik.swagger.model.ApiListing;
-import com.wordnik.swagger.model.Authorization;
-import com.wordnik.swagger.model.Model;
+import com.mangofactory.swagger.models.dto.ApiDescription;
+import com.mangofactory.swagger.models.dto.ApiListing;
+import com.mangofactory.swagger.models.dto.Authorization;
+import com.mangofactory.swagger.models.dto.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,35 +36,36 @@ import java.util.Set;
 import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Maps.*;
 import static com.google.common.collect.Sets.*;
-import static com.mangofactory.swagger.ScalaUtils.*;
 
 public class ApiListingScanner {
   private static final Logger log = LoggerFactory.getLogger(ApiListingScanner.class);
 
-  private String apiVersion = "1.0";
-  private String swaggerVersion = SwaggerSpec.version();
+  private String swaggerVersion = "1.2";
   private Map<ResourceGroup, List<RequestMappingContext>> resourceGroupRequestMappings;
   private SwaggerPathProvider swaggerPathProvider;
   private SwaggerGlobalSettings swaggerGlobalSettings;
-  private ResourceGroupingStrategy resourceGroupingStrategy;
   private AuthorizationContext authorizationContext;
   private final ModelProvider modelProvider;
   private Ordering<ApiDescription> apiDescriptionOrdering = new ApiDescriptionLexicographicalOrdering();
   private Collection<RequestMappingReader> customAnnotationReaders;
+  private final RequestMappingEvaluator requestMappingEvaluator;
 
   public ApiListingScanner(Map<ResourceGroup, List<RequestMappingContext>> resourceGroupRequestMappings,
                            SwaggerPathProvider swaggerPathProvider,
                            ModelProvider modelProvider,
                            AuthorizationContext authorizationContext,
-                           Collection<RequestMappingReader> customAnnotationReaders) {
+                           Collection<RequestMappingReader> customAnnotationReaders,
+                           RequestMappingEvaluator requestMappingEvaluator) {
 
     this.resourceGroupRequestMappings = resourceGroupRequestMappings;
     this.swaggerPathProvider = swaggerPathProvider;
     this.authorizationContext = authorizationContext;
     this.modelProvider = modelProvider;
     this.customAnnotationReaders = customAnnotationReaders;
+    this.requestMappingEvaluator = requestMappingEvaluator;
   }
 
+  @SuppressWarnings("unchecked")
   public Map<String, ApiListing> scan() {
     Map<String, ApiListing> apiListingMap = newHashMap();
     int position = 0;
@@ -82,7 +83,7 @@ public class ApiListingScanner {
 
         List<Command<RequestMappingContext>> readers = newArrayList();
         readers.add(new MediaTypeReader());
-        readers.add(new ApiDescriptionReader(swaggerPathProvider, customAnnotationReaders));
+        readers.add(new ApiDescriptionReader(swaggerPathProvider, customAnnotationReaders, requestMappingEvaluator));
         readers.add(new ApiModelReader(modelProvider));
 
         Map<String, Model> models = new LinkedHashMap<String, Model>();
@@ -108,30 +109,29 @@ public class ApiListingScanner {
           apiDescriptions.addAll(apiDescriptionList);
         }
 
-        scala.collection.immutable.List<Authorization> authorizations = emptyScalaList();
+        List<Authorization> authorizations = new ArrayList<Authorization>();
         if (null != authorizationContext) {
           authorizations = authorizationContext.getScalaAuthorizations();
         }
-
-        Option modelOption = toOption(toScalaModelMap(models));
 
         ArrayList sortedDescriptions = new ArrayList(apiDescriptions);
         Collections.sort(sortedDescriptions, this.apiDescriptionOrdering);
 
         String resourcePath = longestCommonPath(sortedDescriptions);
 
+        String apiVersion = "1.0";
         ApiListing apiListing = new ApiListing(
                 apiVersion,
                 swaggerVersion,
                 swaggerPathProvider.getApplicationBasePath(),
                 resourcePath,
-                toScalaList(produces),
-                toScalaList(consumes),
-                emptyScalaList(),
+                Lists.newArrayList(produces),
+                Lists.newArrayList(consumes),
+                new ArrayList<String>(),
                 authorizations,
-                toScalaList(sortedDescriptions),
-                modelOption,
-                toOption(null),
+                sortedDescriptions,
+                models,
+                null,
                 position++);
 
         apiListingMap.put(resourceGroup.getGroupName(), apiListing);
@@ -139,6 +139,7 @@ public class ApiListingScanner {
     }
     return apiListingMap;
   }
+
 
   private String longestCommonPath(ArrayList<ApiDescription> apiDescriptions) {
     List<String> commons = newArrayList();
@@ -166,11 +167,10 @@ public class ApiListingScanner {
   }
 
   private List<String> urlParts(ApiDescription apiDescription) {
-    List<String> strings = Splitter.on('/')
+    return Splitter.on('/')
             .omitEmptyStrings()
             .trimResults()
-            .splitToList(apiDescription.path());
-    return strings;
+            .splitToList(apiDescription.getPath());
   }
 
   public SwaggerGlobalSettings getSwaggerGlobalSettings() {
@@ -181,8 +181,9 @@ public class ApiListingScanner {
     this.swaggerGlobalSettings = swaggerGlobalSettings;
   }
 
+  @SuppressWarnings("UnusedParameters")
+  @Deprecated //As of 0.9.3 (not used)
   public void setResourceGroupingStrategy(ResourceGroupingStrategy resourceGroupingStrategy) {
-    this.resourceGroupingStrategy = resourceGroupingStrategy;
   }
 
   public void setAuthorizationContext(AuthorizationContext authorizationContext) {

@@ -1,6 +1,7 @@
 package com.mangofactory.swagger.mixins
 import com.fasterxml.classmate.ResolvedType
 import com.fasterxml.classmate.TypeResolver
+import com.mangofactory.swagger.generics.ResponseEntityAlternative
 import com.mangofactory.swagger.models.*
 import com.mangofactory.swagger.models.alternates.Entry
 import org.springframework.http.ResponseEntity
@@ -11,6 +12,9 @@ class TypesForTestingSupport {
 
   static Class simpleType() {
     SimpleType
+  }
+  static Class unwrappedType() {
+    UnwrappedType
   }
   static Class typeWithConstructor() {
     TypeWithConstructor
@@ -62,19 +66,27 @@ class TypesForTestingSupport {
     resolver.resolve(GenericType, resolver.resolve(List, SimpleType))
   }
   static ResolvedType genericClassWithGenericField() {
-    resolver.resolve(GenericType, resolver.resolve(ResponseEntity, SimpleType))
+    resolver.resolve(GenericType, resolver.resolve(ResponseEntityAlternative, SimpleType))
   }
 
   static ResolvedType genericClassWithDeepGenerics() {
-    resolver.resolve(GenericType, resolver.resolve(ResponseEntity, resolver.resolve(List, SimpleType)))
+    resolver.resolve(GenericType, resolver.resolve(ResponseEntityAlternative, resolver.resolve(List, SimpleType)))
   }
 
-  static ResolvedType responseEntityWithDeepGenerics() {
-    resolver.resolve(ResponseEntity, mapsContainer())
+  static ResolvedType genericTypeOfMapsContainer() {
+    resolver.resolve(GenericType, mapsContainer())
   }
 
   static ResolvedType genericCollectionWithEnum() {
     resolver.resolve(GenericType, resolver.resolve(Collection, ExampleEnum))
+  }
+
+  static ResolvedType genericTypeWithPrimitiveArray() {
+    resolver.resolve(GenericType, resolver.arrayType(byte.class))
+  }
+
+  static ResolvedType genericTypeWithComplexArray() {
+    resolver.resolve(GenericType, resolver.arrayType(SimpleType.class))
   }
 
   static ResolvedType genericListOfSimpleType() {
@@ -99,9 +111,16 @@ class TypesForTestingSupport {
   static Class typeForTestingGettersAndSetters() {
     TypeWithGettersAndSetters
   }
+  static Class typeForTestingPropertyNames() {
+    TypeForTestingPropertyNames
+  }
 
   static Class typeForTestingAnnotatedGettersAndSetter(){
     TypeWithAnnotatedGettersAndSetters
+  }
+
+  static Class typeForTestingJsonGetterAnnotation(){
+    TypeWithJsonGetterAnnotation
   }
 
   static ResolvedType hashMap(def keyClazz, def valueClazz) {

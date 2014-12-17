@@ -6,11 +6,11 @@ import com.mangofactory.swagger.mixins.RequestMappingSupport
 import com.mangofactory.swagger.models.alternates.AlternateTypeProvider
 import com.mangofactory.swagger.models.configuration.SwaggerModelsConfiguration
 import com.mangofactory.swagger.scanners.RequestMappingContext
-import com.wordnik.swagger.model.ResponseMessage
+import com.mangofactory.swagger.models.dto.ResponseMessage
 import org.springframework.web.bind.annotation.RequestMethod
 import spock.lang.Specification
 
-import static com.mangofactory.swagger.ScalaUtils.fromOption
+import static com.google.common.collect.Sets.newHashSet
 
 @Mixin(RequestMappingSupport)
 class DefaultResponseMessageReaderSpec extends Specification {
@@ -25,6 +25,7 @@ class DefaultResponseMessageReaderSpec extends Specification {
       RequestMappingContext context = new RequestMappingContext(requestMappingInfo('/somePath'), handlerMethod)
       context.put("swaggerGlobalSettings", swaggerGlobalSettings)
       context.put("currentHttpMethod", currentHttpMethod)
+      context.put("responseMessages", newHashSet())
     when:
       DefaultResponseMessageReader operationResponseMessageReader = new DefaultResponseMessageReader()
       operationResponseMessageReader.execute(context)
@@ -48,6 +49,7 @@ class DefaultResponseMessageReaderSpec extends Specification {
 
       context.put("swaggerGlobalSettings", swaggerGlobalSettings)
       context.put("currentHttpMethod", RequestMethod.GET)
+      context.put("responseMessages", newHashSet())
     when:
       DefaultResponseMessageReader operationResponseMessageReader = new DefaultResponseMessageReader()
       operationResponseMessageReader.execute(context)
@@ -71,14 +73,15 @@ class DefaultResponseMessageReaderSpec extends Specification {
 
       context.put("swaggerGlobalSettings", swaggerGlobalSettings)
       context.put("currentHttpMethod", RequestMethod.GET)
+      context.put("responseMessages", newHashSet())
     when:
       DefaultResponseMessageReader operationResponseMessageReader = new DefaultResponseMessageReader()
       operationResponseMessageReader.execute(context)
       Map<String, Object> result = context.getResult()
       ResponseMessage responseMessage =  result['responseMessages'].find{ it.code == 200 }
     then:
-      responseMessage.code() == 200
-      fromOption(responseMessage.responseModel()) == 'BusinessModel'
-      responseMessage.message() == "OK"
+      responseMessage.getCode() == 200
+      responseMessage.getResponseModel() == 'BusinessModel'
+      responseMessage.getMessage() == "OK"
    }
 }

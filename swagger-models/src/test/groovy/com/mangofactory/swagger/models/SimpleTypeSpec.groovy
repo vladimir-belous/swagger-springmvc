@@ -1,53 +1,54 @@
 package com.mangofactory.swagger.models
+
 import com.mangofactory.swagger.mixins.ModelProviderSupport
 import com.mangofactory.swagger.mixins.TypesForTestingSupport
-import com.wordnik.swagger.model.Model
+import com.mangofactory.swagger.models.dto.Model
 import spock.lang.Ignore
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @Mixin([TypesForTestingSupport, ModelProviderSupport])
 class SimpleTypeSpec extends Specification {
-  def "simple types are rendered correctly"() {
+  @Unroll
+  def "simple type [#qualifiedType] is rendered as [#type]"() {
     given:
       def provider = defaultModelProvider()
       Model asInput = provider.modelFor(ModelContext.inputParam(simpleType())).get()
       Model asReturn = provider.modelFor(ModelContext.returnValue(simpleType())).get()
 
     expect:
-      asInput.name() == "SimpleType"
-      asInput.properties().contains(property)
-      def modelProperty = asInput.properties().get(property)
-      modelProperty.get().type() == type
-      modelProperty.get().qualifiedType() == qualifiedType
-      modelProperty.get().items().isEmpty()
-      Types.isBaseType(type)
+      asInput.getName() == "SimpleType"
+      asInput.getProperties().containsKey(property)
+      def modelProperty = asInput.getProperties().get(property)
+      modelProperty.getType().getAbsoluteType() == type
+      modelProperty.getQualifiedType() == qualifiedType
+      modelProperty.getItems() == null
 
-      asReturn.name() == "SimpleType"
-      asReturn.properties().contains(property)
-      def retModelProperty = asReturn.properties().get(property)
-      retModelProperty.get().type() == type
-      retModelProperty.get().qualifiedType() == qualifiedType
-      retModelProperty.get().items().isEmpty()
-      Types.isBaseType(type)
+      asReturn.getName() == "SimpleType"
+      asReturn.getProperties().containsKey(property)
+      def retModelProperty = asReturn.getProperties().get(property)
+      retModelProperty.getType().getAbsoluteType() == type
+      retModelProperty.getQualifiedType() == qualifiedType
+      retModelProperty.getItems() == null
 
     where:
-      property              | type      | qualifiedType
-      "aString"             | "string"  | "java.lang.String"
-      "aByte"               | "byte"    | "byte"
-      "aBoolean"            | "boolean" | "boolean"
-      "aShort"              | "int"     | "int"
-      "anInt"               | "int"     | "int"
-      "aLong"               | "long"    | "long"
-      "aFloat"              | "float"   | "float"
-      "aDouble"             | "double"  | "double"
-      "anObject"            | "object"  | "java.lang.Object"
-      "anObjectByte"        | "byte"    | "java.lang.Byte"
-      "anObjectBoolean"     | "boolean" | "java.lang.Boolean"
-      "anObjectShort"       | "int"     | "java.lang.Short"
-      "anObjectInt"         | "int"     | "java.lang.Integer"
-      "anObjectLong"        | "long"    | "java.lang.Long"
-      "anObjectFloat"       | "float"   | "java.lang.Float"
-      "anObjectDouble"      | "double"  | "java.lang.Double"
+      property          | type      | qualifiedType
+      "aString"         | "string"  | "java.lang.String"
+      "aByte"           | "string"  | "byte"
+      "aBoolean"        | "boolean" | "boolean"
+      "aShort"          | "integer" | "int"
+      "anInt"           | "integer" | "int"
+      "aLong"           | "integer" | "long"
+      "aFloat"          | "integer" | "float"
+      "aDouble"         | "number"  | "double"
+      "anObjectByte"    | "string"  | "java.lang.Byte"
+      "anObjectBoolean" | "boolean" | "java.lang.Boolean"
+      "anObjectShort"   | "integer" | "java.lang.Short"
+      "anObjectInt"     | "integer" | "java.lang.Integer"
+      "anObjectLong"    | "integer" | "java.lang.Long"
+      "anObjectFloat"   | "integer" | "java.lang.Float"
+      "anObjectDouble"  | "number"  | "java.lang.Double"
+      "currency"        | "string"  | "java.util.Currency"
   }
 
   @Ignore
@@ -58,20 +59,20 @@ class SimpleTypeSpec extends Specification {
       Model asReturn = provider.modelFor(ModelContext.returnValue(typeWithConstructor())).get()
 
     expect:
-      asInput.name() == "TypeWithConstructor"
-      asInput.properties().contains(property)
-      def modelProperty = asInput.properties().get(property)
-      modelProperty.get().type() == type
-      modelProperty.get().qualifiedType() == qualifiedType
-      modelProperty.get().items().isEmpty()
+      asInput.getName() == "TypeWithConstructor"
+      asInput.getProperties().containsKey(property)
+      def modelProperty = asInput.getProperties().get(property)
+      modelProperty.getType() == type
+      modelProperty.getQualifiedType() == qualifiedType
+      modelProperty.getItems() == null
       Types.isBaseType(type)
 
-      asReturn.name() == "TypeWithConstructor"
-      !asReturn.properties().contains(property)
+      asReturn.getName() == "TypeWithConstructor"
+      !asReturn.getProperties().containsKey(property)
 
     where:
-      property              | type      | qualifiedType
-      "stringValue"         | "string"  | "java.lang.String"
+      property      | type     | qualifiedType
+      "stringValue" | "string" | "java.lang.String"
   }
 
   def "Types with properties aliased using JsonProperty annotation"() {
@@ -81,24 +82,24 @@ class SimpleTypeSpec extends Specification {
       Model asReturn = provider.modelFor(ModelContext.returnValue(typeWithJsonPropertyAnnotation())).get()
 
     expect:
-      asInput.name() == "TypeWithJsonProperty"
-      asInput.properties().contains(property)
-      def modelProperty = asInput.properties().get(property)
-      modelProperty.get().type() == type
-      modelProperty.get().qualifiedType() == qualifiedType
-      modelProperty.get().items().isEmpty()
+      asInput.getName() == "TypeWithJsonProperty"
+      asInput.getProperties().containsKey(property)
+      def modelProperty = asInput.getProperties().get(property)
+      modelProperty.getType().getAbsoluteType() == type
+      modelProperty.getQualifiedType() == qualifiedType
+      modelProperty.getItems() == null
       Types.isBaseType(type)
 
-      asReturn.name() == "TypeWithJsonProperty"
-      asReturn.properties().contains(property)
-      def retModelProperty = asReturn.properties().get(property)
-      retModelProperty.get().type() == type
-      retModelProperty.get().qualifiedType() == qualifiedType
-      retModelProperty.get().items().isEmpty()
+      asReturn.getName() == "TypeWithJsonProperty"
+      asReturn.getProperties().containsKey(property)
+      def retModelProperty = asReturn.getProperties().get(property)
+      retModelProperty.getType().getAbsoluteType() == type
+      retModelProperty.getQualifiedType() == qualifiedType
+      retModelProperty.getItems() == null
       Types.isBaseType(type)
 
     where:
-      property              | type      | qualifiedType
-      "some_odd_ball_name"  | "string"  | "java.lang.String"
+      property             | type     | qualifiedType
+      "some_odd_ball_name" | "string" | "java.lang.String"
   }
 }

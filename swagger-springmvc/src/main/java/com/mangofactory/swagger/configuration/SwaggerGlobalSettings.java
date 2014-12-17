@@ -2,12 +2,14 @@ package com.mangofactory.swagger.configuration;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.mangofactory.swagger.models.alternates.AlternateTypeProvider;
-import com.wordnik.swagger.model.ResponseMessage;
+import com.mangofactory.swagger.models.dto.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.collect.Maps.*;
 
 public class SwaggerGlobalSettings {
   /**
@@ -21,7 +23,7 @@ public class SwaggerGlobalSettings {
    *
    * @see com.mangofactory.swagger.readers.operation.DefaultResponseMessageReader
    */
-  private Map<RequestMethod, List<ResponseMessage>> globalResponseMessages;
+  private Map<RequestMethod, List<ResponseMessage>> globalResponseMessages = newHashMap();
   private TypeResolver typeResolver = new TypeResolver();
   private AlternateTypeProvider alternateTypeProvider;
 

@@ -1,14 +1,17 @@
 package com.mangofactory.swagger.plugin;
 
 import com.fasterxml.classmate.TypeResolver;
-import com.google.common.collect.Lists;
+import com.google.common.base.Optional;
 import com.google.common.collect.Ordering;
 import com.mangofactory.swagger.authorization.AuthorizationContext;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.configuration.SwaggerGlobalSettings;
+import com.mangofactory.swagger.core.RequestMappingEvaluator;
 import com.mangofactory.swagger.core.ResourceGroupingStrategy;
 import com.mangofactory.swagger.core.SwaggerApiResourceListing;
+import com.mangofactory.swagger.models.GenericTypeNamingStrategy;
 import com.mangofactory.swagger.models.ModelProvider;
+import com.mangofactory.swagger.models.ResolvedTypes;
 import com.mangofactory.swagger.models.alternates.AlternateTypeProvider;
 import com.mangofactory.swagger.models.alternates.AlternateTypeRule;
 import com.mangofactory.swagger.models.alternates.WildcardType;
@@ -17,11 +20,15 @@ import com.mangofactory.swagger.ordering.ResourceListingLexicographicalOrdering;
 import com.mangofactory.swagger.paths.SwaggerPathProvider;
 import com.mangofactory.swagger.readers.operation.RequestMappingReader;
 import com.mangofactory.swagger.scanners.ApiListingReferenceScanner;
-import com.wordnik.swagger.model.ApiDescription;
-import com.wordnik.swagger.model.ApiInfo;
-import com.wordnik.swagger.model.ApiListingReference;
-import com.wordnik.swagger.model.AuthorizationType;
-import com.wordnik.swagger.model.ResponseMessage;
+import com.mangofactory.swagger.scanners.RegexRequestMappingPatternMatcher;
+import com.mangofactory.swagger.scanners.RequestMappingPatternMatcher;
+import com.mangofactory.swagger.models.dto.ApiDescription;
+import com.mangofactory.swagger.models.dto.ApiInfo;
+import com.mangofactory.swagger.models.dto.ApiListingReference;
+import com.mangofactory.swagger.models.dto.AuthorizationType;
+import com.mangofactory.swagger.models.dto.ResponseMessage;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -29,16 +36,17 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.google.common.collect.Lists.*;
+import static com.google.common.collect.Maps.*;
 import static com.mangofactory.swagger.models.alternates.Alternates.*;
-import static java.util.Arrays.*;
-import static org.apache.commons.lang.StringUtils.*;
+import static java.util.Arrays.asList;
+import static org.springframework.util.StringUtils.*;
 
 /**
  * A builder which is intended to be the primary interface into the swagger-springmvc framework.
@@ -48,7 +56,7 @@ public class SwaggerSpringMvcPlugin {
 
   private ModelProvider modelProvider;
   private String swaggerGroup;
-  private List<String> includePatterns;
+  private List<String> includePatterns = newArrayList(".*?");
   private SwaggerPathProvider swaggerPathProvider;
   private List<AuthorizationType> authorizationTypes;
   private ApiInfo apiInfo;
@@ -58,8 +66,7 @@ public class SwaggerSpringMvcPlugin {
   private String apiVersion = "1.0";
 
   private SwaggerGlobalSettings swaggerGlobalSettings = new SwaggerGlobalSettings();
-  private Map<RequestMethod, List<ResponseMessage>> globalResponseMessages = new HashMap<RequestMethod,
-          List<ResponseMessage>>();
+  private Map<RequestMethod, List<ResponseMessage>> globalResponseMessages = newHashMap();
   private Set<Class> ignorableParameterTypes = new HashSet<Class>();
   private AlternateTypeProvider alternateTypeProvider;
   private List<AlternateTypeRule> alternateTypeRules = new ArrayList<AlternateTypeRule>();
@@ -69,7 +76,11 @@ public class SwaggerSpringMvcPlugin {
   private Ordering<ApiDescription> apiDescriptionOrdering = new ApiDescriptionLexicographicalOrdering();
   private ApiListingReferenceScanner apiListingReferenceScanner;
   private AtomicBoolean initialized = new AtomicBoolean(false);
-  private Collection<RequestMappingReader> customAnnotationReaders;
+  private Collection<RequestMappingReader> customAnnotationReaders = newArrayList();
+  private boolean applyDefaultResponseMessages = true;
+  private RequestMappingEvaluator requestMappingEvaluator;
+  private RequestMappingPatternMatcher requestMappingPatternMatcher = new RegexRequestMappingPatternMatcher();
+  private boolean enabled = true;
 
   /**
    * Default constructor.
@@ -112,8 +123,6 @@ public class SwaggerSpringMvcPlugin {
    *
    * @param authorizationContext
    * @return this SwaggerSpringMvcPlugin
-   * @see <a href="https://github.com/adrianbk/swagger-springmvc-demo/blob/m
-   * aster/spring3-testsuite/src/main/java/com/ak/spring3/testsuite/config/SwaggerConfig.java">SwaggerConfig.java</a>
    */
   public SwaggerSpringMvcPlugin authorizationContext(AuthorizationContext authorizationContext) {
     this.authorizationContext = authorizationContext;
@@ -134,7 +143,7 @@ public class SwaggerSpringMvcPlugin {
 
   /**
    * Determines the generated, swagger specific, urls.
-   * <p/>
+   * 
    * By default, relative urls are generated. If absolute urls are required, supply an implementation of
    * AbsoluteSwaggerPathProvider
    *
@@ -161,14 +170,14 @@ public class SwaggerSpringMvcPlugin {
   /**
    * Controls which controllers, more specifically, which Spring RequestMappings to include in the swagger Resource
    * Listing.
-   * <p/>
+   * 
    * Under the hood, <code>com.mangofactory.swagger.scanners.RequestMappingPatternMatcher</code>is used to match a
    * given <code>org.springframework.web.servlet.mvc.condition.PatternsRequestCondition</code> against the
    * includePatterns supplied here.
-   * <p/>
+   * 
    * <code>RegexRequestMappingPatternMatcher</code> is the default implementation and requires these includePatterns
    * are  valid regular expressions.
-   * <p/>
+   * 
    * If not supplied a single pattern ".*?" is used which matches anything and hence all RequestMappings.
    *
    * @param includePatterns - the regular expressions to determine which Spring RequestMappings to include.
@@ -181,7 +190,7 @@ public class SwaggerSpringMvcPlugin {
 
   /**
    * Overrides the default http response messages at the http request method level.
-   * <p/>
+   * 
    * To set specific response messages for specific api operations use the swagger core annotations on
    * the appropriate controller methods.
    *
@@ -194,7 +203,8 @@ public class SwaggerSpringMvcPlugin {
    * @see com.mangofactory.swagger.configuration.SpringSwaggerConfig#defaultResponseMessages()
    */
   public SwaggerSpringMvcPlugin globalResponseMessage(RequestMethod requestMethod,
-                                                      List<ResponseMessage> responseMessages) {
+      List<ResponseMessage> responseMessages) {
+
     this.globalResponseMessages.put(requestMethod, responseMessages);
     return this;
   }
@@ -276,10 +286,21 @@ public class SwaggerSpringMvcPlugin {
   }
 
   /**
+   * Allows ignoring predefined response message defaults
+   * @param apply flag to determine if the default response messages are used
+   *     true   - the default response messages are added to the global response messages
+   *     false  - the default response messages are added to the global response messages
+   * @return this SwaggerSpringMvcPlugin
+   */
+  public SwaggerSpringMvcPlugin useDefaultResponseMessages(boolean apply) {
+    this.applyDefaultResponseMessages = apply;
+    return this;
+  }
+  /**
    * Substitutes each generic class with it's direct parameterized type.
    * e.g.
    * <code>.genericModelSubstitutes(ResponseEntity.class)</code>
-   * would substitute ResponseEntity<MyModel> with MyModel
+   * would substitute ResponseEntity &lt;MyModel&gt; with MyModel
    *
    * @param genericClasses - generic classes on which to apply generic model substitution.
    * @return this SwaggerSpringMvcPlugin
@@ -290,6 +311,18 @@ public class SwaggerSpringMvcPlugin {
       this.alternateTypeRules.add(newRule(typeResolver.resolve(clz, WildcardType.class),
               typeResolver.resolve(WildcardType.class)));
     }
+    return this;
+  }
+
+  /**
+   * Controls how generics are encoded as swagger types, specifically around the characters used to open, close,
+   * and delimit lists of types.
+   *
+   * @param strategy a GenericTypeNamingStrategy implementation, defaults to DefaultGenericTypeNamingStrategy
+   * @return this SwaggerSpringMvcPlugin
+   */
+  public SwaggerSpringMvcPlugin genericTypeNamingStrategy(GenericTypeNamingStrategy strategy) {
+    ResolvedTypes.setNamingStrategy(strategy);
     return this;
   }
 
@@ -339,7 +372,32 @@ public class SwaggerSpringMvcPlugin {
    * @return this SwaggerSpringMvcPlugin
    */
   public SwaggerSpringMvcPlugin customAnnotationReaders(Collection<RequestMappingReader> customAnnotationReaders) {
-    this.customAnnotationReaders = customAnnotationReaders;
+    this.customAnnotationReaders = newArrayList(customAnnotationReaders);
+    return this;
+  }
+
+  /**
+   * Hook for adding custom annotations readers. Useful when you want to add your own annotation to be mapped to swagger
+   * model.
+   *
+   * @param requestMappingPatternMatcher an implementation of {@link com.mangofactory.swagger.scanners
+   * .RequestMappingPatternMatcher}. Out of the box the library comes with
+   * {@link com.mangofactory.swagger.scanners.RegexRequestMappingPatternMatcher} and
+   * {@link com.mangofactory.swagger.scanners.AntRequestMappingPatternMatcher}
+   * @return this SwaggerSpringMvcPlugin
+   */
+  public SwaggerSpringMvcPlugin requestMappingPatternMatcher(RequestMappingPatternMatcher requestMappingPatternMatcher) {
+    this.requestMappingPatternMatcher = requestMappingPatternMatcher;
+    return this;
+  }
+
+  /**
+   * Hook to externally control the fact the swagger processing engine
+   * @param externallyConfiguredFlag - true to turn it on, false to turn it off
+   * @return this SwaggerSpringMvcPlugin
+   */
+  public SwaggerSpringMvcPlugin enable(boolean externallyConfiguredFlag) {
+    this.enabled = externallyConfiguredFlag;
     return this;
   }
 
@@ -358,7 +416,9 @@ public class SwaggerSpringMvcPlugin {
    * Called by the framework hence protected
    */
   protected void initialize() {
-    this.build().swaggerApiResourceListing.initialize();
+    if (enabled) {
+      this.build().swaggerApiResourceListing.initialize();
+    }
   }
 
   /**
@@ -380,7 +440,7 @@ public class SwaggerSpringMvcPlugin {
   }
 
   private void configure() {
-    if (isBlank(this.swaggerGroup)) {
+    if (!hasText(this.swaggerGroup)) {
       this.swaggerGroup = "default";
     }
 
@@ -388,35 +448,28 @@ public class SwaggerSpringMvcPlugin {
       this.apiInfo = defaultApiInfo();
     }
 
-    if (null == this.resourceGroupingStrategy) {
-      this.resourceGroupingStrategy = springSwaggerConfig.defaultResourceGroupingStrategy();
-    }
+    this.resourceGroupingStrategy = Optional.fromNullable(resourceGroupingStrategy)
+            .or(springSwaggerConfig.defaultResourceGroupingStrategy());
 
-    if (null == this.includePatterns || this.includePatterns.size() == 0) {
-      this.includePatterns = asList(".*?");
-    }
+    this.swaggerPathProvider = Optional.fromNullable(swaggerPathProvider)
+            .or(springSwaggerConfig.defaultSwaggerPathProvider());
 
-    if (null == swaggerPathProvider) {
-      this.swaggerPathProvider = springSwaggerConfig.defaultSwaggerPathProvider();
-    }
+    this.alternateTypeProvider = Optional.fromNullable(alternateTypeProvider)
+            .or(springSwaggerConfig.defaultAlternateTypeProvider());
 
-    if (null == this.alternateTypeProvider) {
-      this.alternateTypeProvider = springSwaggerConfig.defaultAlternateTypeProvider();
-    }
+    this.modelProvider = Optional.fromNullable(modelProvider).or(springSwaggerConfig.defaultModelProvider());
 
-    if (null == this.modelProvider) {
-      this.modelProvider = springSwaggerConfig.defaultModelProvider();
-    }
-
-    if (null == this.customAnnotationReaders) {
-      this.customAnnotationReaders = Lists.newArrayList();
-    }
+    List<Class<? extends Annotation>> mergedExcludedAnnotations = springSwaggerConfig.defaultExcludeAnnotations();
+    mergedExcludedAnnotations.addAll(this.excludeAnnotations);
+    requestMappingEvaluator
+            = new RequestMappingEvaluator(mergedExcludedAnnotations, requestMappingPatternMatcher, includePatterns);
   }
 
   private void buildSwaggerGlobalSettings() {
-    Map<RequestMethod, List<ResponseMessage>> mergedResponseMessages = new HashMap<RequestMethod,
-            List<ResponseMessage>>();
-    mergedResponseMessages.putAll(springSwaggerConfig.defaultResponseMessages());
+    Map<RequestMethod, List<ResponseMessage>> mergedResponseMessages = newHashMap();
+    if (this.applyDefaultResponseMessages) {
+      mergedResponseMessages.putAll(springSwaggerConfig.defaultResponseMessages());
+    }
     mergedResponseMessages.putAll(this.globalResponseMessages);
     swaggerGlobalSettings.setGlobalResponseMessages(mergedResponseMessages);
 
@@ -424,11 +477,21 @@ public class SwaggerSpringMvcPlugin {
     mergedIgnorableParameterTypes.addAll(springSwaggerConfig.defaultIgnorableParameterTypes());
     mergedIgnorableParameterTypes.addAll(this.ignorableParameterTypes);
     swaggerGlobalSettings.setIgnorableParameterTypes(mergedIgnorableParameterTypes);
+    addSpringMvcPassthroughTypes();
 
     for (AlternateTypeRule rule : this.alternateTypeRules) {
       this.alternateTypeProvider.addRule(rule);
     }
     swaggerGlobalSettings.setAlternateTypeProvider(this.alternateTypeProvider);
+  }
+
+  private void addSpringMvcPassthroughTypes() {
+    TypeResolver typeResolver = swaggerGlobalSettings.getTypeResolver();
+    alternateTypeProvider.addRule(newRule(typeResolver.resolve(ResponseEntity.class, WildcardType.class),
+            typeResolver.resolve(WildcardType.class)));
+
+    alternateTypeProvider.addRule(newRule(typeResolver.resolve(HttpEntity.class, WildcardType.class),
+            typeResolver.resolve(WildcardType.class)));
   }
 
   private void buildSwaggerApiResourceListing() {
@@ -443,6 +506,7 @@ public class SwaggerSpringMvcPlugin {
     swaggerApiResourceListing.setApiVersion(this.apiVersion);
     swaggerApiResourceListing.setApiListingReferenceOrdering(this.apiListingReferenceOrdering);
     swaggerApiResourceListing.setApiDescriptionOrdering(this.apiDescriptionOrdering);
+    swaggerApiResourceListing.setRequestMappingEvaluator(requestMappingEvaluator);
     swaggerApiResourceListing.setCustomAnnotationReaders(this.customAnnotationReaders);
   }
 
@@ -453,11 +517,16 @@ public class SwaggerSpringMvcPlugin {
     apiListingReferenceScanner = new ApiListingReferenceScanner();
     apiListingReferenceScanner.setRequestMappingHandlerMapping(springSwaggerConfig
             .swaggerRequestMappingHandlerMappings());
-    apiListingReferenceScanner.setExcludeAnnotations(mergedExcludedAnnotations);
     apiListingReferenceScanner.setResourceGroupingStrategy(this.resourceGroupingStrategy);
     apiListingReferenceScanner.setSwaggerPathProvider(this.swaggerPathProvider);
     apiListingReferenceScanner.setSwaggerGroup(this.swaggerGroup);
+    apiListingReferenceScanner.setRequestMappingEvaluator(requestMappingEvaluator);
     apiListingReferenceScanner.setIncludePatterns(this.includePatterns);
+    apiListingReferenceScanner.setExcludeAnnotations(mergedExcludedAnnotations);
     return apiListingReferenceScanner;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 }

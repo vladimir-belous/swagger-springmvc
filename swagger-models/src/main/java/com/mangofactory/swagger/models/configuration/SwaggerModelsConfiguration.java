@@ -32,6 +32,7 @@ public class SwaggerModelsConfiguration {
     alternateTypeProvider.addRule(newRule(typeResolver.resolve(Map.class, String.class, String.class),
             typeResolver.resolve(Object.class)));
     alternateTypeProvider.addRule(newMapRule(WildcardType.class, WildcardType.class));
+
     return alternateTypeProvider;
   }
 }

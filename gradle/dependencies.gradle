@@ -1,0 +1,55 @@
+ext {
+  swaggerCore = "1.3.11"
+  spring = "3.2.9.RELEASE"
+  scalaLib = "2.10.4"
+  groovy = "2.3.8"
+  spock = "0.7-groovy-2.0"
+  guava = "15.0"
+  springHateoas = "0.10.0.RELEASE"
+  slf4j = "1.7.7"
+  mockito = "1.10.13"
+  servlet = "2.5"
+  guava = "15.0"
+  classmate = "1.1.0"
+  jackson = '2.4.4'
+  libs = [
+
+          test          : [
+                  "org.springframework:spring-test:${spring}",
+                  "cglib:cglib-nodep:3.1",
+                  "org.objenesis:objenesis:2.1",
+                  "org.mockito:mockito-all:${mockito}",
+                  "com.jayway.jsonpath:json-path:1.2.0",
+                  "org.slf4j:slf4j-simple:1.7.7",
+                  "org.yaml:snakeyaml:1.14",
+                  "org.spockframework:spock-spring:${spock}",
+                  "org.spockframework:spock-core:${spock}"
+          ],
+
+          swaggerCore   : [
+                  "com.wordnik:swagger-annotations:${swaggerCore}"
+          ],
+
+          spring        : [
+                  "org.springframework:spring-web:$spring",
+                  "org.springframework:spring-webmvc:$spring"
+          ],
+
+          clientProvided: [
+                  "javax.servlet:servlet-api:${servlet}",
+                  "com.fasterxml.jackson.core:jackson-core:${jackson}",
+                  "com.fasterxml.jackson.core:jackson-databind:${jackson}"
+
+          ],
+
+          core          : [
+                  "org.codehaus.groovy:groovy-all:${groovy}",
+                  "com.google.guava:guava:${guava}",
+                  "com.fasterxml:classmate:${classmate}",
+                  "org.slf4j:slf4j-api:${slf4j}",
+                  'joda-time:joda-time:2.5'
+
+          ]
+
+  ]
+}

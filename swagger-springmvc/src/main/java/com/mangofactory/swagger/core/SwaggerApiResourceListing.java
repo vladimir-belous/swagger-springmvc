@@ -13,13 +13,12 @@ import com.mangofactory.swagger.scanners.ApiListingReferenceScanner;
 import com.mangofactory.swagger.scanners.ApiListingScanner;
 import com.mangofactory.swagger.scanners.RequestMappingContext;
 import com.mangofactory.swagger.scanners.ResourceGroup;
-import com.wordnik.swagger.core.SwaggerSpec;
-import com.wordnik.swagger.model.ApiDescription;
-import com.wordnik.swagger.model.ApiInfo;
-import com.wordnik.swagger.model.ApiListing;
-import com.wordnik.swagger.model.ApiListingReference;
-import com.wordnik.swagger.model.AuthorizationType;
-import com.wordnik.swagger.model.ResourceListing;
+import com.mangofactory.swagger.models.dto.ApiDescription;
+import com.mangofactory.swagger.models.dto.ApiInfo;
+import com.mangofactory.swagger.models.dto.ApiListing;
+import com.mangofactory.swagger.models.dto.ApiListingReference;
+import com.mangofactory.swagger.models.dto.AuthorizationType;
+import com.mangofactory.swagger.models.dto.ResourceListing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static com.mangofactory.swagger.ScalaUtils.*;
 
 public class SwaggerApiResourceListing {
   private static final Logger log = LoggerFactory.getLogger(SwaggerApiResourceListing.class);
@@ -47,6 +44,7 @@ public class SwaggerApiResourceListing {
   private Ordering<ApiListingReference> apiListingReferenceOrdering = new ResourceListingLexicographicalOrdering();
   private Ordering<ApiDescription> apiDescriptionOrdering = new ApiDescriptionLexicographicalOrdering();
   private Collection<RequestMappingReader> customAnnotationReaders;
+  private RequestMappingEvaluator requestMappingEvaluator;
 
   public SwaggerApiResourceListing(SwaggerCache swaggerCache, String swaggerGroup) {
     this.swaggerCache = swaggerCache;
@@ -62,7 +60,7 @@ public class SwaggerApiResourceListing {
       Map<ResourceGroup, List<RequestMappingContext>> resourceGroupRequestMappings =
               apiListingReferenceScanner.getResourceGroupRequestMappings();
       ApiListingScanner apiListingScanner = new ApiListingScanner(resourceGroupRequestMappings, swaggerPathProvider,
-              modelProvider, authorizationContext, customAnnotationReaders);
+              modelProvider, authorizationContext, customAnnotationReaders, requestMappingEvaluator);
 
       apiListingScanner.setApiDescriptionOrdering(apiDescriptionOrdering);
       apiListingScanner.setSwaggerGlobalSettings(swaggerGlobalSettings);
@@ -79,18 +77,18 @@ public class SwaggerApiResourceListing {
 
     ResourceListing resourceListing = new ResourceListing(
             this.apiVersion,
-            SwaggerSpec.version(),
-            toScalaList(apiListingReferences),
-            toScalaList(authorizationTypes),
-            toOption(apiInfo)
+            "1.2",
+            apiListingReferences,
+            authorizationTypes == null ? new ArrayList<AuthorizationType>() : authorizationTypes,
+            apiInfo
     );
 
     log.info("Added a resource listing with ({}) api resources: ", apiListingReferences.size());
     for (ApiListingReference apiListingReference : apiListingReferences) {
-      String path = fromOption(apiListingReference.description());
+      String path = apiListingReference.getDescription();
       String prefix = (path != null && path.startsWith("http")) ? path : DefaultSwaggerController
               .DOCUMENTATION_BASE_PATH;
-      log.info("  {} at location: {}{}", path, prefix, apiListingReference.path());
+      log.info("  {} at location: {}{}", path, prefix, apiListingReference.getPath());
     }
 
     swaggerCache.addSwaggerResourceListing(swaggerGroup, resourceListing);
@@ -154,5 +152,9 @@ public class SwaggerApiResourceListing {
 
   public void setCustomAnnotationReaders(Collection<RequestMappingReader> customAnnotationReaders) {
     this.customAnnotationReaders = customAnnotationReaders;
+  }
+
+  public void setRequestMappingEvaluator(RequestMappingEvaluator requestMappingEvaluator) {
+    this.requestMappingEvaluator = requestMappingEvaluator;
   }
 }

@@ -3,6 +3,7 @@ package com.mangofactory.swagger.dummy;
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.mangofactory.swagger.dummy.models.Example;
 import com.mangofactory.swagger.dummy.models.FoobarDto;
+import com.mangofactory.swagger.dummy.models.Treeish;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -31,6 +32,10 @@ public class DummyClass {
 
   @ApiOperation(value = "description", httpMethod = "GET")
   public void methodWithHttpGETMethod() {
+  }
+
+  @ApiOperation(value = "description", httpMethod = "GET", hidden = true)
+  public void methodThatIsHidden() {
   }
 
   @ApiOperation(value = "description", httpMethod = "RUBBISH")
@@ -74,6 +79,13 @@ public class DummyClass {
   public void methodApiResponseClass() {
   }
 
+  @ApiResponses({
+          @ApiResponse(code = 201, response = Void.class, message = "Rule Scheduled successfuly"),
+          @ApiResponse(code = 500, response = RestError.class, message = "Internal Server Error"),
+          @ApiResponse(code = 406, response = RestError.class, message = "Not acceptable")})
+  public void methodAnnotatedWithApiResponse() {
+  }
+
   @ApiOperation(value = "SomeVal",
           authorizations = @Authorization(value = "oauth2",
                   scopes = {@AuthorizationScope(scope = "scope", description = "scope description")
@@ -88,6 +100,14 @@ public class DummyClass {
 
   @ApiOperation(value = "")
   public DummyModels.Paginated<BusinessType> methodWithGenericType() {
+    return null;
+  }
+
+  public ResponseEntity<byte[]> methodWithGenericPrimitiveArray() {
+    return null;
+  }
+
+  public ResponseEntity<DummyClass[]> methodWithGenericComplexArray() {
     return null;
   }
 
@@ -111,6 +131,9 @@ public class DummyClass {
   }
 
   public void methodWithoutModelAttribute(Example example) {
+  }
+
+  public void methodWithTreeishModelAttribute(@ModelAttribute Treeish example) {
   }
 
   @RequestMapping("/businesses/{businessId}")

@@ -16,7 +16,7 @@ import java.util.Set;
 import static com.google.common.base.Strings.*;
 import static com.google.common.collect.Sets.*;
 import static com.mangofactory.swagger.core.StringUtils.*;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.springframework.util.StringUtils.*;
 
 @Component
 public class ClassOrApiAnnotationResourceGrouping implements ResourceGroupingStrategy {
@@ -36,7 +36,7 @@ public class ClassOrApiAnnotationResourceGrouping implements ResourceGroupingStr
   public Integer getResourcePosition(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
     Class<?> controllerClass = handlerMethod.getBeanType();
     Api apiAnnotation = AnnotationUtils.findAnnotation(controllerClass, Api.class);
-    if (null != apiAnnotation && !isBlank(apiAnnotation.value())) {
+    if (null != apiAnnotation && hasText(apiAnnotation.value())) {
       return apiAnnotation.position();
     }
     return 0;
@@ -44,7 +44,9 @@ public class ClassOrApiAnnotationResourceGrouping implements ResourceGroupingStr
 
   @Override
   public Set<ResourceGroup> getResourceGroups(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
-    String group = getClassOrApiAnnotationValue(handlerMethod).toLowerCase().replaceAll(" ", "-");
+    String group = getClassOrApiAnnotationValue(handlerMethod).toLowerCase()
+            .replaceAll(" ", "-")
+            .replaceAll("/", "");
     Integer position = getResourcePosition(requestMappingInfo, handlerMethod);
     return newHashSet(new ResourceGroup(group.toLowerCase(), position));
   }
@@ -56,8 +58,9 @@ public class ClassOrApiAnnotationResourceGrouping implements ResourceGroupingStr
     return extractAnnotation(controllerClass, valueExtractor()).or(group);
   }
 
-  private Optional<String> extractAnnotation(Class<?> controllerClass, Function<Api,
-          Optional<String>> annotationExtractor) {
+  private Optional<String> extractAnnotation(Class<?> controllerClass,
+      Function<Api, Optional<String>> annotationExtractor) {
+
     Api apiAnnotation = AnnotationUtils.findAnnotation(controllerClass, Api.class);
     return annotationExtractor.apply(apiAnnotation);
   }

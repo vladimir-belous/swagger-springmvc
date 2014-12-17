@@ -4,33 +4,32 @@ import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * After an application context refresh, builds and executes all SwaggerSpringMvcPlugin instances found in the
  * application
  * context.
- * <p/>
+ * 
  * If no instances SwaggerSpringMvcPlugin are found a default one is created and executed.
  */
 public class SwaggerPluginAdapter implements ApplicationListener<ContextRefreshedEvent> {
   private static final Logger log = LoggerFactory.getLogger(SwaggerPluginAdapter.class);
   private SpringSwaggerConfig springSwaggerConfig;
-  private boolean initialized = false;
+  private AtomicBoolean initialized = new AtomicBoolean(false);
 
-  @Autowired
   public SwaggerPluginAdapter(SpringSwaggerConfig springSwaggerConfig) {
     this.springSwaggerConfig = springSwaggerConfig;
   }
 
   @Override
   public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-    if (!initialized) {
+    if (initialized.compareAndSet(false, true)) {
       log.info("Context refreshed");
       ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
 
@@ -47,15 +46,18 @@ public class SwaggerPluginAdapter implements ApplicationListener<ContextRefreshe
         log.info("Found custom SwaggerSpringMvcPlugins");
 
         for (Map.Entry<String, SwaggerSpringMvcPlugin> entry : plugins.entrySet()) {
-          log.info("initializing plugin bean {}", entry.getKey());
-          entry.getValue()
-                  .build()
-                  .initialize();
+          if (entry.getValue().isEnabled()) {
+            log.info("initializing plugin bean {}", entry.getKey());
+            entry.getValue()
+                    .build()
+                    .initialize();
+          } else {
+            log.info("Skipping initializing disabled plugin bean {}", entry.getKey());
+          }
         }
       }
-      initialized = true;
     } else {
-      log.warn("SwaggerSpringMvcPlugin have already been initialized!");
+      log.info("Skipping SwaggerSpringMvcPlugin initialization already initialized!");
     }
   }
 }

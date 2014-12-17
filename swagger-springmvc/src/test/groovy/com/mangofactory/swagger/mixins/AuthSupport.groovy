@@ -1,14 +1,34 @@
 package com.mangofactory.swagger.mixins
 
-import com.wordnik.swagger.model.*
+import com.mangofactory.swagger.models.dto.Authorization
+import com.mangofactory.swagger.models.dto.AuthorizationCodeGrant
+import com.mangofactory.swagger.models.dto.AuthorizationScope
+import com.mangofactory.swagger.models.dto.AuthorizationType
+import com.mangofactory.swagger.models.dto.GrantType
+import com.mangofactory.swagger.models.dto.ImplicitGrant
+import com.mangofactory.swagger.models.dto.LoginEndpoint
+import com.mangofactory.swagger.models.dto.OAuth
+import com.mangofactory.swagger.models.dto.OAuthBuilder
+import com.mangofactory.swagger.models.dto.TokenEndpoint
+import com.mangofactory.swagger.models.dto.TokenRequestEndpoint
 
-import static com.google.common.collect.Lists.newArrayList
+import static com.google.common.collect.Lists.*
 
 class AuthSupport {
   def defaultAuth() {
     AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything")
     AuthorizationScope[] authorizationScopes = [authorizationScope] as AuthorizationScope[];
-    List<Authorization> authorizations = [new Authorization("oauth2", authorizationScopes)];
+    newArrayList(new Authorization("oauth2", authorizationScopes))
+  }
+
+  def oAuth() {
+    AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything")
+    List<AuthorizationScope> authorizationScopes = newArrayList(authorizationScope)
+    GrantType grantType = new AuthorizationCodeGrant(new TokenRequestEndpoint("some:auth:uri", "test", "secret"),
+            new TokenEndpoint("some:uri", "XX-TOKEN"))
+    List<GrantType> grantTypes = newArrayList(grantType)
+    OAuth oAuth = new OAuthBuilder().scopes(authorizationScopes).grantTypes(grantTypes).build()
+    List<Authorization> authorizations = [oAuth];
     authorizations
   }
 
@@ -32,14 +52,15 @@ class AuthSupport {
     grantTypes.add(authorizationCodeGrant)
 
     OAuth oAuth = new OAuthBuilder()
-        .scopes(authorizationScopeList)
-        .grantTypes(grantTypes)
-        .build();
+            .scopes(authorizationScopeList)
+            .grantTypes(grantTypes)
+            .build();
     return oAuth
   }
 
   def assertDefaultAuth(json) {
-    def oauth2 = json.authorizations['oauth2']
+    def oauth2 = json.authorizations.get('oauth2')
+
     assert oauth2.type == "oauth2"
     assert oauth2.scopes[0].scope == "global"
     assert oauth2.scopes[0].description == "access all"

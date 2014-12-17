@@ -1,0 +1,143 @@
+ext {
+  developerMachines = ['adrianxbk']
+
+  relUsername = project.hasProperty('bintray_username') ? project.property('bintray_username') : 'admin'
+  relPassword = project.hasProperty('bintray_password') ? project.property('bintray_password') : 'password'
+
+  if (developerMachines.contains(System.getenv('USER'))) {
+    artifactRepoBase = 'http://localhost:8081/artifactory'
+    repoPrefix = 'libs'
+  } else {
+    artifactRepoBase = 'http://oss.jfrog.org/artifactory'
+    repoPrefix = 'oss'
+  }
+
+
+  releaseRepos = {
+    maven {
+      name 'jcenter'
+      url "${artifactRepoBase}/${repoPrefix}-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
+      credentials {
+        username = "$relUsername"
+        password = "$relPassword"
+      }
+    }
+
+    if (!project.version.endsWith('-SNAPSHOT')) {
+      maven {
+        name 'bintray'
+        url "https://api.bintray.com/maven/swaggerspringmvc/swaggerspringmvc/${project.name}"
+        credentials {
+          username = relUsername
+          password = relPassword
+        }
+      }
+    }
+  }
+
+  pomMetaData = {
+    resolveStrategy = Closure.DELEGATE_FIRST
+    name "${project.name}"
+    url "https://github.com/martypitt/swagger-springmvc"
+    description "This project integrates swagger with the Spring Web MVC framework"
+
+    scm {
+      url "scm:git:git@github.com:martypitt/swagger-springmvc.git"
+      connection 'scm:git:git@github.com:martypitt/swagger-springmvc.git'
+      developerConnection 'scm:git:git@github.com:martypitt/swagger-springmvc.git'
+    }
+
+    licenses {
+      license {
+        name "The Apache Software License, Version 2.0"
+        url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        distribution "repo"
+      }
+    }
+    developers {
+      developer {
+        id "martypitt@me.com"
+        name "Marty Pitt"
+        organization "The Mango Factory"
+        email "martypitt@me.com"
+      }
+      developer {
+        id "dilipkrish"
+        name "Dilip Krishnan"
+        organization "The Container Store"
+        email "dilipkrish_subscriptions@yahoo.com"
+      }
+      developer {
+        id "adrianbk"
+        name "Adrian Kelly"
+        organization "DiUS Computing"
+        email "adrianbkelly+swagger@gmail.com"
+      }
+    }
+  }
+
+  //Gralde's maven-publish plugin does not yet handles pom generation correctly. Fix expected in 2.1
+  swaggerMvcPomConfig = {
+    def root = asNode()
+    def dependencies = root.dependencies
+    def allDependencies = dependencies.'*'
+
+    allDependencies.findAll() {
+      project.configurations.provided.allDependencies.find { dep ->
+        dep.name == it.artifactId.text()
+      }
+    }.each() {
+      it.scope*.value = 'provided'
+    }
+
+    //Fix issue with maven-publish plugin setting compile deps to runtime
+    allDependencies.findAll() {
+      it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+        dep.name == it.artifactId.text()
+      }
+    }.each() {
+      it.scope*.value = 'compile'
+    }
+
+    Node groovyDep = allDependencies.find { it.artifactId.text() == 'groovy-all' }
+    groovyDep.scope*.value = 'test'
+
+    root.children().last() + pomMetaData
+  }
+}
+
+
+task packageSources(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar (type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+task preRelease << {
+  def url = new URL("http://oss.jfrog.org/simple/oss-release-local/com/mangofactory/swagger-springmvc/${project.version}")
+  logger.quiet("Checking release repo for duplicate versioning:${url}")
+  final HttpURLConnection connection = url.openConnection()
+  if (connection.responseCode != 404) {
+    throw new GradleException("Artifact ${project.name}:${project.version} already exists.")
+  }
+}
+
+afterEvaluate { project ->
+  project.tasks.findAll { it.name.contains('ToBintrayRepository') }.each {
+    it.dependsOn preRelease
+  }
+}
+
+task ciPublish {
+  if (project.version.contains('SNAPSHOT')) {
+    logger.quiet("Task :ciPublish configured to publish SNAPSHOT artifacts [${project.version}]")
+    dependsOn publish
+  } else {
+    logger.quiet("Task :ciPublish will not publish artifacts [${project.version}] as this is not a SNAPSHOT version")
+  }
+}
+

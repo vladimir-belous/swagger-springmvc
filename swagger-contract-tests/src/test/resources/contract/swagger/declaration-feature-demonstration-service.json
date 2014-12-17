@@ -1,0 +1,1046 @@
+{
+    "apiVersion": "1.0",
+    "swaggerVersion": "1.2",
+    "basePath": "/",
+    "resourcePath": "/features",
+    "produces": [
+        "*/*"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "apis": [
+        {
+            "path": "/features/allMethodsAllowed",
+            "description": "allMethodAllowed",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": "OK"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "HEAD",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 204,
+                            "message": "No Content"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "POST",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "PUT",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "PATCH",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 204,
+                            "message": "No Content"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 204,
+                            "message": "No Content"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "OPTIONS",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 204,
+                            "message": "No Content"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                },
+                {
+                    "method": "TRACE",
+                    "summary": "allMethodAllowed",
+                    "notes": "allMethodAllowed",
+                    "nickname": "allMethodAllowed",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 204,
+                            "message": "No Content"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/bare",
+            "description": "getBare",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "getBare",
+                    "notes": "getBare",
+                    "nickname": "getBare",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": false,
+                            "defaultValue": "",
+                            "description": "example",
+                            "name": "body",
+                            "paramType": "body",
+                            "type": "Example",
+                            "required": false
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/bigDecimal",
+            "description": "updateBigDecimal",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "updateBigDecimal",
+                    "notes": "updateBigDecimal",
+                    "nickname": "updateBigDecimal",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": false,
+                            "defaultValue": "",
+                            "description": "input",
+                            "name": "body",
+                            "paramType": "body",
+                            "format": "double",
+                            "type": "number",
+                            "required": false
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/date",
+            "description": "updateDate",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "updateDate",
+                    "notes": "updateDate",
+                    "nickname": "updateDate",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": false,
+                            "defaultValue": "",
+                            "description": "localDate",
+                            "name": "body",
+                            "paramType": "body",
+                            "type": "LocalDate",
+                            "required": false
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/effective",
+            "description": "getEffective",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "getEffective",
+                    "notes": "getEffective",
+                    "nickname": "getEffective",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": "OK",
+                            "responseModel": "Example"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "Example"
+                }
+            ]
+        },
+        {
+            "path": "/features/effectives",
+            "description": "getEffectives",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "getEffectives",
+                    "notes": "getEffectives",
+                    "nickname": "getEffectives",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": "OK",
+                            "responseModel": "List"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "array",
+                    "items": {
+                        "type": "Example"
+                    },
+                    "uniqueItems": false
+                }
+            ]
+        },
+        {
+            "path": "/features/status",
+            "description": "updateBaz",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "updateBaz",
+                    "notes": "updateBaz",
+                    "nickname": "updateBaz",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": false,
+                            "enum": [
+                                "ONE",
+                                "TWO"
+                            ],
+                            "defaultValue": "",
+                            "description": "enumType",
+                            "name": "body",
+                            "paramType": "body",
+                            "type": "string",
+                            "required": false
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/statuses",
+            "description": "updateBazes",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "updateBazes",
+                    "notes": "updateBazes",
+                    "nickname": "updateBazes",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": true,
+                            "defaultValue": "",
+                            "description": "enumType",
+                            "name": "body",
+                            "paramType": "body",
+                            "type": "Collection\u00abstring\u00bb",
+                            "required": false
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": null
+                        },
+                        {
+                            "code": 201,
+                            "message": "Created"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "void"
+                }
+            ]
+        },
+        {
+            "path": "/features/{petId}",
+            "description": "getPetById",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Find pet by ID",
+                    "notes": "Returns a pet when ID < 10. ID > 10 or nonintegers will simulate API error conditions",
+                    "nickname": "getPetById",
+                    "produces": [
+                        "*/*"
+                    ],
+                    "consumes": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "allowMultiple": false,
+                            "maximum": "5",
+                            "minimum": "1",
+                            "defaultValue": "",
+                            "description": "ID of pet that needs to be fetched",
+                            "name": "petId",
+                            "paramType": "path",
+                            "type": "string",
+                            "required": true
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 200,
+                            "message": "OK",
+                            "responseModel": "Pet"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not Found"
+                        }
+                    ],
+                    "deprecated": "false",
+                    "type": "Pet"
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Pet": {
+            "description": "",
+            "id": "Pet",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                },
+                "id": {
+                    "required": false,
+                    "type": "string"
+                },
+                "age": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "Void": {
+            "description": "",
+            "id": "Void",
+            "properties": {
+
+            }
+        },
+        "DateTimeField": {
+            "description": "",
+            "id": "DateTimeField",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                },
+                "type": {
+                    "required": false,
+                    "type": "DateTimeFieldType"
+                },
+                "supported": {
+                    "required": false,
+                    "type": "boolean"
+                },
+                "lenient": {
+                    "required": false,
+                    "type": "boolean"
+                },
+                "rangeDurationField": {
+                    "required": false,
+                    "type": "DurationField"
+                },
+                "leapDurationField": {
+                    "required": false,
+                    "type": "DurationField"
+                },
+                "durationField": {
+                    "required": false,
+                    "type": "DurationField"
+                },
+                "minimumValue": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "maximumValue": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "DateTimeZone": {
+            "description": "",
+            "id": "DateTimeZone",
+            "properties": {
+                "fixed": {
+                    "required": false,
+                    "type": "boolean"
+                }
+            }
+        },
+        "Example": {
+            "description": "",
+            "id": "Example",
+            "properties": {
+                "foo": {
+                    "required": false,
+                    "type": "string"
+                },
+                "bar": {
+                    "description": "description of bar",
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "enumType": {
+                    "allowableValues": {
+                        "enum": [
+                            "ONE",
+                            "TWO"
+                        ]
+                    },
+                    "required": false,
+                    "type": "string"
+                },
+                "annotatedEnumType": {
+                    "allowableValues": {
+                        "enum": [
+                            "ONE",
+                            "TWO"
+                        ]
+                    },
+                    "required": false,
+                    "type": "string"
+                },
+                "nestedType": {
+                    "required": false,
+                    "type": "NestedType"
+                },
+                "allCapsSet": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "required": false,
+                    "type": "Set"
+                },
+                "propertyWithNoSetterMethod": {
+                    "required": false,
+                    "type": "string"
+                },
+                "localDateTime": {
+                    "required": false,
+                    "type": "LocalDateTime"
+                },
+                "parentBeanProperty": {
+                    "required": false,
+                    "type": "string"
+                }
+            }
+        },
+        "DurationFieldType": {
+            "description": "",
+            "id": "DurationFieldType",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                }
+            }
+        },
+        "LocalDateTime": {
+            "description": "",
+            "id": "LocalDateTime",
+            "properties": {
+                "year": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "chronology": {
+                    "required": false,
+                    "type": "Chronology"
+                },
+                "centuryOfEra": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "yearOfEra": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "yearOfCentury": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "weekyear": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "monthOfYear": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "weekOfWeekyear": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "hourOfDay": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "minuteOfHour": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "secondOfMinute": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "millisOfSecond": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "dayOfMonth": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "era": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "millisOfDay": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "dayOfYear": {
+                    "required": false,
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "fields": {
+                    "items": {
+                        "type": "DateTimeField"
+                    },
+                    "required": false,
+                    "type": "Array"
+                },
+                "values": {
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "required": false,
+                    "type": "Array"
+                },
+                "fieldTypes": {
+                    "items": {
+                        "type": "DateTimeFieldType"
+                    },
+                    "required": false,
+                    "type": "Array"
+                }
+            }
+        },
+        "NestedType": {
+            "description": "",
+            "id": "NestedType",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                }
+            }
+        },
+        "DurationField": {
+            "description": "",
+            "id": "DurationField",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                },
+                "type": {
+                    "required": false,
+                    "type": "DurationFieldType"
+                },
+                "supported": {
+                    "required": false,
+                    "type": "boolean"
+                },
+                "unitMillis": {
+                    "required": false,
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "precise": {
+                    "required": false,
+                    "type": "boolean"
+                }
+            }
+        },
+        "Chronology": {
+            "description": "",
+            "id": "Chronology",
+            "properties": {
+                "zone": {
+                    "required": false,
+                    "type": "DateTimeZone"
+                }
+            }
+        },
+        "DateTimeFieldType": {
+            "description": "",
+            "id": "DateTimeFieldType",
+            "properties": {
+                "name": {
+                    "required": false,
+                    "type": "string"
+                },
+                "durationType": {
+                    "required": false,
+                    "type": "DurationFieldType"
+                },
+                "rangeDurationType": {
+                    "required": false,
+                    "type": "DurationFieldType"
+                }
+            }
+        }
+    }
+}

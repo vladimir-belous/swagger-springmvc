@@ -2,6 +2,7 @@ package com.mangofactory.swagger.configuration
 import com.fasterxml.classmate.TypeResolver
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.mangofactory.swagger.core.ClassOrApiAnnotationResourceGrouping
+import com.mangofactory.swagger.core.RequestMappingEvaluator
 import com.mangofactory.swagger.core.SwaggerApiResourceListing
 import com.mangofactory.swagger.core.SwaggerCache
 import com.mangofactory.swagger.mixins.RequestMappingSupport
@@ -10,6 +11,12 @@ import com.mangofactory.swagger.models.DefaultModelProvider
 import com.mangofactory.swagger.models.ModelDependencyProvider
 import com.mangofactory.swagger.models.ModelProvider
 import com.mangofactory.swagger.models.ObjectMapperBeanPropertyNamingStrategy
+import com.mangofactory.swagger.models.dto.ApiInfo
+import com.mangofactory.swagger.models.dto.ApiKey
+import com.mangofactory.swagger.models.dto.ApiListing
+import com.mangofactory.swagger.models.dto.ApiListingReference
+import com.mangofactory.swagger.models.dto.AuthorizationType
+import com.mangofactory.swagger.models.dto.ResourceListing
 import com.mangofactory.swagger.models.property.bean.AccessorsProvider
 import com.mangofactory.swagger.models.property.bean.BeanModelPropertyProvider
 import com.mangofactory.swagger.models.property.constructor.ConstructorModelPropertyProvider
@@ -21,12 +28,12 @@ import com.mangofactory.swagger.ordering.ResourceListingPositionalOrdering
 import com.mangofactory.swagger.paths.AbsoluteSwaggerPathProvider
 import com.mangofactory.swagger.paths.SwaggerPathProvider
 import com.mangofactory.swagger.scanners.ApiListingReferenceScanner
-import com.wordnik.swagger.core.SwaggerSpec
+import com.mangofactory.swagger.scanners.RegexRequestMappingPatternMatcher
 import com.wordnik.swagger.model.*
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import spock.lang.Specification
 
-import static com.mangofactory.swagger.ScalaUtils.*
+import static com.google.common.collect.Lists.newArrayList
 
 @Mixin([RequestMappingSupport, SpringSwaggerConfigSupport])
 class SwaggerApiResourceListingSpec extends Specification {
@@ -53,13 +60,13 @@ class SwaggerApiResourceListingSpec extends Specification {
 
     then: "I should should have the correct defaults"
       ResourceListing resourceListing = swaggerCache.getResourceListing("default")
-      def apiListingReferenceList = fromScalaList(resourceListing.apis())
-      def authorizationTypes = fromScalaList(resourceListing.authorizations())
+      def apiListingReferenceList = resourceListing.getApis()
+      def authorizationTypes = resourceListing.getAuthorizations()
 
-      resourceListing.apiVersion() == "1"
-      resourceListing.swaggerVersion() == SwaggerSpec.version()
+      resourceListing.getApiVersion() == "1"
+      resourceListing.getSwaggerVersion() == "1.2"
 
-      fromOption(resourceListing.info()) == null
+      resourceListing.getInfo() == null
       apiListingReferenceList == []
       authorizationTypes == []
   }
@@ -74,12 +81,12 @@ class SwaggerApiResourceListingSpec extends Specification {
       swaggerApiResourceListing.initialize()
 
     then:
-      swaggerApiResourceListing.apiInfo.title() == "title"
-      swaggerApiResourceListing.apiInfo.description() == "description"
-      swaggerApiResourceListing.apiInfo.termsOfServiceUrl() == "terms"
-      swaggerApiResourceListing.apiInfo.contact() == "contact"
-      swaggerApiResourceListing.apiInfo.license() == "license"
-      swaggerApiResourceListing.apiInfo.licenseUrl() == "licenseUrl"
+      swaggerApiResourceListing.apiInfo.getTitle() == "title"
+      swaggerApiResourceListing.apiInfo.getDescription() == "description"
+      swaggerApiResourceListing.apiInfo.getTermsOfServiceUrl() == "terms"
+      swaggerApiResourceListing.apiInfo.getContact() == "contact"
+      swaggerApiResourceListing.apiInfo.getLicense() == "license"
+      swaggerApiResourceListing.apiInfo.getLicenseUrl() == "licenseUrl"
   }
 
   def "resource with authorization types"() {
@@ -93,7 +100,7 @@ class SwaggerApiResourceListingSpec extends Specification {
 
     then:
       ResourceListing resourceListing = swaggerCache.getResourceListing("default")
-      def authorizationTypes = fromScalaList(resourceListing.authorizations())
+      def authorizationTypes = resourceListing.getAuthorizations()
       def apiKeyAuthType = authorizationTypes[0]
       apiKeyAuthType instanceof ApiKey
       apiKeyAuthType.keyname == "api_key"
@@ -140,31 +147,36 @@ class SwaggerApiResourceListingSpec extends Specification {
       def requestHandlerMapping = Mock(RequestMappingHandlerMapping)
       requestHandlerMapping.getHandlerMethods() >> handlerMethods
 
+      def requestMappingEvaluator = new RequestMappingEvaluator(newArrayList(), new RegexRequestMappingPatternMatcher(),
+              newArrayList(".*"))
       ApiListingReferenceScanner scanner = new ApiListingReferenceScanner()
       scanner.setRequestMappingHandlerMapping([requestHandlerMapping])
       scanner.setResourceGroupingStrategy(new ClassOrApiAnnotationResourceGrouping())
       scanner.setSwaggerGroup("swaggerGroup")
+      scanner.setRequestMappingEvaluator(requestMappingEvaluator)
 
       scanner.setSwaggerPathProvider(swaggerPathProvider)
       swaggerApiResourceListing.setModelProvider(modelProvider)
       swaggerApiResourceListing.setApiListingReferenceScanner(scanner)
+
+      swaggerApiResourceListing.setRequestMappingEvaluator(requestMappingEvaluator)
 
     when:
       swaggerApiResourceListing.initialize()
       ResourceListing resourceListing = swaggerCache.getResourceListing("swaggerGroup")
 
     then:
-      ApiListingReference apiListingReference = resourceListing.apis().head()
-      apiListingReference.path() == "http://localhost:8080/context-path/api-docs/swaggerGroup/dummy-class"
-      apiListingReference.position() == 0
-      fromOption(apiListingReference.description()) == "Dummy Class"
+      ApiListingReference apiListingReference = resourceListing.getApis().head()
+      apiListingReference.getPath() == "http://localhost:8080/context-path/api-docs/swaggerGroup/dummy-class"
+      apiListingReference.getPosition() == 0
+      apiListingReference.getDescription() == "Dummy Class"
 
     and:
       ApiListing apiListing =
             swaggerCache.swaggerApiListingMap['swaggerGroup']['dummy-class']
-      apiListing.swaggerVersion() == '1.2'
-      apiListing.basePath() == 'http://localhost:8080/context-path'
-      apiListing.resourcePath() == '/somePath'
+      apiListing.getSwaggerVersion() == '1.2'
+      apiListing.getBasePath() == 'http://localhost:8080/context-path'
+      apiListing.getResourcePath() == '/somePath'
   }
 
   def "Should sort based on position"() {
@@ -175,15 +187,15 @@ class SwaggerApiResourceListingSpec extends Specification {
 
       ApiListingReferenceScanner apiListingReferenceScanner = Mock()
       apiListingReferenceScanner.getApiListingReferences() >> [
-            new ApiListingReference("/b", toOption('b'), 1),
-            new ApiListingReference("/a", toOption('a'), 2)
+            new ApiListingReference("/b", 'b', 1),
+            new ApiListingReference("/a", 'a', 2)
       ]
 
       swaggerApiResourceListing.apiListingReferenceScanner = apiListingReferenceScanner
 
     when:
       swaggerApiResourceListing.initialize()
-      def apis = fromScalaList(swaggerCache.getResourceListing('default').apis())
+      def apis = swaggerCache.getResourceListing('default').getApis()
     then:
       apis[0].position == firstPosition
       apis[0].path == firstPath
